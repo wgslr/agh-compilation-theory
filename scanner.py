@@ -36,6 +36,9 @@ def t_error(t):
     print("line %d: illegal character '%s'" %(t.lineno, t.value[0]) )
     t.lexer.skip(1)
 
+def t_comment(t):
+    r'\#.*'
+    pass
 
 lexer = lex.lex()
 fh = None
