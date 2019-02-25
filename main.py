@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import sys
 import ply.lex as lex
 import scanner  # scanner.py is a file you create, (it is not an external library)
@@ -22,7 +22,8 @@ if __name__ == '__main__':
         tok = lexer.token()
         if not tok: 
             break    # No more input
-        column = scanner.find_column(text,tok)
-        print("(%d,%d): %s(%s)" %(tok.lineno, column, tok.type, tok.value))
+        #column = scanner.find_column(text,tok)
+        #print("(%d,%d): %s(%s)" %(tok.lineno, column, tok.type, tok.value))
+        print("({}): {}({})".format(tok.lineno, tok.type, tok.value))
 
         
