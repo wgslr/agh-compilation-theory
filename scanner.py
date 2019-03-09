@@ -2,23 +2,22 @@
 
 import sys
 import ply.lex as lex
-
 literals = "+-*/=()[]{}:',;<>"
 
-tokens = ('ELEMWISE_PLUS', 'ELEMWISE_MINUS', 'ELEMWISE_MUL', 'ELEMWISE_DIV',
-          'ASSIGN_PLUS', 'ASSIGN_MINUS', 'ASSIGN_MUL', 'ASSIGN_DIV', 'LEQ',
-          'GEQ', 'NEQ', 'EQ', 'NUMBER', 'FLOAT', 'ID', 
+tokens = ('DOTSUM', 'DOTSUB', 'DOTMUL', 'DOTDIV',
+          'SUMASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN', 'LEQ',
+          'GEQ', 'NEQ', 'EQ', 'INTNUM', 'FLOATNUM', 'ID', 
           )
 
-t_ELEMWISE_PLUS = r'\.+'
-t_ELEMWISE_MINUS = r'\.+'
-t_ELEMWISE_MUL = 'r\.\*'
-t_ELEMWISE_DIV = 'r\./'
+t_DOTSUM = r'\.+'
+t_DOTSUB = r'\.+'
+t_DOTMUL = 'r\.\*'
+t_DOTDIV = 'r\./'
 
-t_ASSIGN_PLUS = r'\+='
-t_ASSIGN_MINUS = r'-='
-t_ASSIGN_MUL = r'\*='
-t_ASSIGN_DIV = r'/='
+t_SUMASSIGN = r'\+='
+t_SUBASSIGN = r'-='
+t_MULASSIGN = r'\*='
+t_DIVASSIGN = r'/='
 
 t_LEQ = r'<='
 t_GEQ = r'>='
@@ -29,7 +28,7 @@ t_EQ = r'=='
 
 t_ignore = ' \t'
 
-def t_NUMBER(t):
+def t_INTNUM(t):
     r'\d+'
     t.value = int(t.value)
     return t
