@@ -29,8 +29,7 @@ t_EQ = r'=='
 t_ignore = ' \t'
 
 def t_FLOATNUM(t):
-    r'[+-]?\d*\.\d+([eE][+-]?\d+)?'
-    print(t.value)
+    r'(?i)[+-]?\d*(\.\d+|\B(?=e))(e[+-]?\d+)?'
     t.value = float(t.value)
     return t
 
