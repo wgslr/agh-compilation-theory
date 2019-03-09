@@ -10,7 +10,7 @@ keywords = ('IF', 'ELSE', 'FOR', 'WHILE', 'BREAK', 'CONTINUE',
 
 tokens = ('DOTADD', 'DOTSUB', 'DOTMUL', 'DOTDIV',
           'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN', 'LEQ',
-          'GEQ', 'NEQ', 'EQ', 'INTNUM', 'FLOATNUM', 'ID',
+          'GEQ', 'NEQ', 'EQ', 'INTNUM', 'FLOATNUM', 'STRING', 'ID'
           ) + keywords
 
 t_DOTADD = r'\.\+'
@@ -27,8 +27,6 @@ t_LEQ = r'<='
 t_GEQ = r'>='
 t_NEQ = r'!='
 t_EQ = r'=='
-
-#t_STRING = r'.+'
 
 t_ignore = ' \t'
 
@@ -59,6 +57,12 @@ def t_error(t):
 def t_comment(t):
     r'\#.*'
     pass
+
+
+def t_STRING(t):
+    r'".*?[^\\]"|\'.*?[^\\]\''
+
+    return t
 
 
 def t_ID(t):
