@@ -9,10 +9,10 @@ tokens = ('DOTSUM', 'DOTSUB', 'DOTMUL', 'DOTDIV',
           'GEQ', 'NEQ', 'EQ', 'INTNUM', 'FLOATNUM', 'ID', 
           )
 
-t_DOTSUM = r'\.+'
-t_DOTSUB = r'\.+'
-t_DOTMUL = 'r\.\*'
-t_DOTDIV = 'r\./'
+t_DOTSUM = r'\.\+'
+t_DOTSUB = r'\.-'
+t_DOTMUL = r'\.\*'
+t_DOTDIV = r'\./'
 
 t_SUMASSIGN = r'\+='
 t_SUBASSIGN = r'-='
@@ -29,7 +29,8 @@ t_EQ = r'=='
 t_ignore = ' \t'
 
 def t_FLOATNUM(t):
-    r'(?i)[+-]?\d*(\.\d+|\B(?=e))(e[+-]?\d+)?'
+    # fraction part can be omitted if exponent is present
+    r'(?i)[+-]?\d*((\d\.|\.\d)\d*|\B(?=e))(e[+-]?\d+)?'
     t.value = float(t.value)
     return t
 
