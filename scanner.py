@@ -62,7 +62,7 @@ def t_comment(t):
 
 
 def t_ID(t):
-    r'[a-zA-mZ_]\w*'
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
 
     if t.value.upper() in keywords:
         t.type = t.value.upper()
