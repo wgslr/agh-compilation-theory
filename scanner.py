@@ -28,11 +28,16 @@ t_EQ = r'=='
 
 t_ignore = ' \t'
 
-def t_INTNUM(t):
-    r'\d+'
-    t.value = int(t.value)
+def t_FLOATNUM(t):
+    r'[+-]?\d*\.\d+([eE][+-]?\d+)?'
+    print(t.value)
+    t.value = float(t.value)
     return t
 
+def t_INTNUM(t):
+    r'[+-]?\d+'
+    t.value = int(t.value)
+    return t
 
 def t_newline(t):
     r'\n+'
