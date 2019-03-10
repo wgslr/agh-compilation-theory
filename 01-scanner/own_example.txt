@@ -16,19 +16,13 @@ myfloat5 = 4e12
 myfloat6 = 4E12
 str1 = "string"
 str2 = "str'e'ing"
-str3 = '123'
-str4 = '1"23'
-str5 = '1"2 \'3'
 twostrings = "123" + "345"
 str6 = "abc 'def' gh"
-str7 = 'abc "def" gh'
 someint = 123abc
 noflaot = 353e
 noflaot = 353.e
 something
 empty1 = ""
-empty2 = ''
 semiempty = " "
-multile = "abc \
-def"
+multile = "abc \ def"
 transp = A'.*B'
