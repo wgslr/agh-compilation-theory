@@ -1,0 +1,34 @@
+A = zeros(5);  # create 5x5 matrix filled with zeros
+B = ones(7);   # create 7x7 matrix filled with ones
+I = eye(10);   # create 10x10 matrix filled with ones on diagonal and zeros elsewhere
+D1 = A.+B' ; # add element-wise A with transpose of B
+D2 -= A.-B' ; # substract element-wise A with transpose of B
+D3 *= A.*B' ; # multiply element-wise A with transpose of B
+D4 /= A./B' ; # divide element-wise A with transpose of B
+myint = -3
+yourint = 5
+yourint2 = +5
+myfloat1 = .3
+myfloat2 = 4.5
+myfloat3 = 4.0
+myfloat4 = 4.0e12
+myfloat5 = 4e12
+myfloat6 = 4E12
+str1 = "string"
+str2 = "str'e'ing"
+str3 = '123'
+str4 = '1"23'
+str5 = '1"2 \'3'
+twostrings = "123" + "345"
+str6 = "abc 'def' gh"
+str7 = 'abc "def" gh'
+someint = 123abc
+noflaot = 353e
+noflaot = 353.e
+something
+empty1 = ""
+empty2 = ''
+semiempty = " "
+multile = "abc \
+def"
+transp = A'.*B'
