@@ -33,7 +33,7 @@ t_ignore = ' \t'
 
 def t_FLOATNUM(t):
     # fraction part can be omitted if exponent is present
-    r'(?i)\d*((\d\.|\.\d)\d*(e[+-]?\d+)?|\d(e[+-]?\d+))'
+    r'\d*((\d\.|\.\d)\d*([eE][+-]?\d+)?|\d([eE][+-]?\d+))'
     t.value = float(t.value)
     return t
 
