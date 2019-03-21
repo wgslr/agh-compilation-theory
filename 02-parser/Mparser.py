@@ -5,6 +5,7 @@ import ply.yacc as yacc
 
 
 tokens = scanner.tokens
+literals = scanner.literals
 
 precedence = (
    # to fill ...
