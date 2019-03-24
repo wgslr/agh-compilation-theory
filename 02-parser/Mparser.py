@@ -34,9 +34,9 @@ def p_error(p):
 # Main productions
 # -------------------------
 
-def p_start(p):
-    """start : expression
-             | start expression"""
+def p_mul_expressions(p):
+    """mul_expressions : expression
+             | mul_expressions expression"""
     # if len(p) == 2:
     #     print("p[1]=", p[1])
     # else:
@@ -47,7 +47,9 @@ def p_start(p):
 def p_expr(p):
     """expression : assignment
                   | assignment ';'
-                  | cond
+                  | while
+                  | for
+                  | block
                   | operation ';'"""  # fixme remove operation, cond(Added only for tests purpose)
     p[0] = p[1]
 
@@ -63,6 +65,25 @@ def p_operation(p):
                  | neg_num
                  | transpose"""
     p[0] = p[1]
+
+
+def p_block(p):
+    """block : '{' mul_expressions '}'"""
+    p[0] = p[2]
+
+
+# -------------------------
+# Loops
+# -------------------------
+
+def p_while(p):
+    """while : WHILE '(' cond ')' expression"""
+    p[0] = p[5]
+
+
+def p_for(p):
+    """for : FOR int_num_var ':' int_num_var expression"""
+    p[0] = p[5]
 
 
 # -------------------------
@@ -116,6 +137,12 @@ def p_num(p):
     """num : INTNUM 
            | FLOATNUM
            | var"""
+    p[0] = p[1]
+
+
+def p_int_num_var(p):
+    """int_num_var : INTNUM
+                   | var"""
     p[0] = p[1]
 
 
