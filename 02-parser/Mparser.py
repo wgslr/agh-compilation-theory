@@ -10,6 +10,7 @@ symtab = {}
 
 precedence = (
     ("right", '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
+    ("left", '<', '>', 'EQ', 'NEQ', 'GEQ', 'LEQ'),
     ("left", '+', '-'),
     ("left", 'DOTADD', 'DOTSUB'),
     ("left", '*', '/'),
@@ -29,6 +30,10 @@ def p_error(p):
         print("Unexpected end of input")
 
 
+# -------------------------
+# Main productions
+# -------------------------
+
 def p_start(p):
     """start : expression
              | start expression"""
@@ -42,40 +47,61 @@ def p_start(p):
 def p_expr(p):
     """expression : assignment
                   | assignment ';'
-                  | operation
-                  | operation ';'"""
+                  | cond
+                  | operation ';'"""  # fixme remove operation, cond(Added only for tests purpose)
     p[0] = p[1]
 
 
+def p_cond(p):
+    """cond : cmp
+            | operation"""
+    p[0] = p[1]
+
+
+def p_operation(p):
+    """operation : num
+                 | neg_num
+                 | transpose"""
+    p[0] = p[1]
+
+
+# -------------------------
+# Assignments
+# -------------------------
+
 def p_assignment(p):
-    """assignment : ID '=' operation"""
+    """assignment : ID '=' cond"""
     symtab[p[1]] = p[3]
     p[0] = p[3]
 
 
 def p_addassignment(p):
-    """assignment : ID ADDASSIGN operation"""
+    """assignment : ID ADDASSIGN cond"""
     symtab[p[1]] += p[3]
     p[0] = symtab[p[1]]
 
 
 def p_subassignment(p):
-    """assignment : ID SUBASSIGN operation"""
+    """assignment : ID SUBASSIGN cond"""
     symtab[p[1]] -= p[3]
     p[0] = symtab[p[1]]
 
 
 def p_mulassignment(p):
-    """assignment : ID MULASSIGN operation"""
+    """assignment : ID MULASSIGN cond"""
     symtab[p[1]] *= p[3]
     p[0] = symtab[p[1]]
 
 
 def p_divassignment(p):
-    """assignment : ID DIVASSIGN operation"""
+    """assignment : ID DIVASSIGN cond"""
     symtab[p[1]] /= p[3]
     p[0] = symtab[p[1]]
 
+
+# -------------------------
+# Numeric and variables
+# -------------------------
 
 def p_var(p):
     """var : ID"""
@@ -93,6 +119,10 @@ def p_num(p):
     p[0] = p[1]
 
 
+# -------------------------
+# Unary operations
+# -------------------------
+
 def p_neg(p):
     """neg_num : '-' num %prec UMINUS"""
     p[0] = -p[2]
@@ -103,12 +133,9 @@ def p_transpose(p):
     p[0] = p[1]
 
 
-def p_operation(p):
-    """operation : num
-                 | neg_num
-                 | transpose"""
-    p[0] = p[1]
-
+# -------------------------
+# Binary operations
+# -------------------------
 
 def p_operation_sum(p):
     """operation : operation '+' operation
@@ -144,6 +171,37 @@ def p_operation_dot_mul(p):
         p[0] = p[1] * p[3]
     else:
         p[0] = p[1] / p[3]
+
+
+# -------------------------
+# Binary comparisons operations
+# -------------------------
+
+def p_operation_cmp(p):
+    """cmp : operation '<' operation
+           | operation '>' operation"""
+    if p[2] == '<':
+        p[0] = p[1] < p[3]
+    else:
+        p[0] = p[1] > p[3]
+
+
+def p_operation_cmp_eq(p):
+    """cmp : operation EQ operation
+           | operation NEQ operation"""
+    if p[2] == '==':
+        p[0] = p[1] == p[3]
+    else:
+        p[0] = p[1] != p[3]
+
+
+def p_operation_cmp_geq(p):
+    """cmp : operation GEQ operation
+           | operation LEQ operation"""
+    if p[2] == '>=':
+        p[0] = p[1] >= p[3]
+    else:
+        p[0] = p[1] <= p[3]
 
 
 def p_operation_group(p):
