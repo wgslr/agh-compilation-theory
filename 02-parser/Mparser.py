@@ -6,7 +6,6 @@ import ply.yacc as yacc
 tokens = scanner.tokens
 literals = scanner.literals
 
-symtab = {}
 
 precedence = (
     ("right", '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
@@ -22,10 +21,9 @@ precedence = (
 
 def p_error(p):
     if p:
-        print("Syntax error at line {0}, column {1}: LexToken({2}, '{3}')".format(p.lineno,
-                                                                                  scanner.find_column(p.lexer.lexdata,
-                                                                                                      p),
-                                                                                  p.type, p.value))
+        print("Syntax error at line {0}, column {1}: LexToken({2}, '{3}')"
+              .format(p.lineno, scanner.find_column(p.lexer.lexdata, p),
+                      p.type, p.value))
     else:
         print("Unexpected end of input")
 
@@ -34,14 +32,9 @@ def p_error(p):
 # Main productions
 # -------------------------
 
-def p_mul_expressions(p):
+def p_mul_expressions(_p):
     """mul_expressions : expression
                        | expression mul_expressions"""
-    # if len(p) == 2:
-    #     print("p[1]=", p[1])
-    # else:
-    #     print("p[2]=", p[2])
-    p[0] = p[1]
 
 
 def p_expr(_p):
@@ -58,22 +51,19 @@ def p_base_expr(_p):
                  | print"""
 
 
-def p_cond(p):
+def p_cond(_p):
     """cond : cmp
             | operation"""
-    p[0] = p[1]
 
 
-def p_operation(p):
+def p_operation(_p):
     """operation : num
-                 | neg_num
-                 | transpose"""
-    p[0] = p[1]
+                 | unary_op
+                 | fun"""
 
 
-def p_block(p):
+def p_block(_p):
     """block : '{' mul_expressions '}'"""
-    p[0] = p[2]
 
 
 def p_print(_p):
@@ -89,6 +79,52 @@ def p_print_body(_p):
 def p_return(_p):
     """return : RETURN cond
               | RETURN"""
+
+
+# -------------------------
+# Matrices
+# -------------------------
+
+def p_vector(_p):
+    """vector : '[' vector_body ']'"""
+
+
+def p_vector_body(_p):
+    """vector_body : num
+                   | vector_body ',' num
+                   | empty"""
+
+
+def p_matrix(_p):
+    """matrix : '[' matrix_body ']'"""
+
+
+def p_matrix_body(_p):
+    """matrix_body : vector
+                   | matrix_body ',' vector
+                   | empty"""
+
+
+# -------------------------
+# Arrays
+# -------------------------
+
+def p_array_range(_p):
+    """array_range : ID '[' int_num_var ',' int_num_var ']'"""
+
+
+# -------------------------
+# Funs
+# -------------------------
+
+def p_fun(_p):
+    """fun : fun_name '(' num ')'"""
+
+
+def p_fun_name(_p):
+    """fun_name : ZEROS
+                | ONES
+                | EYE"""
 
 
 # -------------------------
@@ -157,151 +193,114 @@ def p_empty(_p):
 # Assignments
 # -------------------------
 
-def p_assignment(p):
-    """assignment : ID '=' cond
-                  | ID '=' STRING"""
-    symtab[p[1]] = p[3]
-    p[0] = p[3]
+def p_assignee(_p):
+    """assignee : ID
+                | array_range"""
 
 
-def p_addassignment(p):
-    """assignment : ID ADDASSIGN cond"""
-    symtab[p[1]] += p[3]
-    p[0] = symtab[p[1]]
+def p_assignment(_p):
+    """assignment : assignee '=' cond
+                  | assignee '=' matrix
+                  | assignee '=' STRING"""
 
 
-def p_subassignment(p):
-    """assignment : ID SUBASSIGN cond"""
-    symtab[p[1]] -= p[3]
-    p[0] = symtab[p[1]]
+def p_addassignment(_p):
+    """assignment : assignee ADDASSIGN cond"""
 
 
-def p_mulassignment(p):
-    """assignment : ID MULASSIGN cond"""
-    symtab[p[1]] *= p[3]
-    p[0] = symtab[p[1]]
+def p_subassignment(_p):
+    """assignment : assignee SUBASSIGN cond"""
 
 
-def p_divassignment(p):
+def p_mulassignment(_p):
+    """assignment : assignee MULASSIGN cond"""
+
+
+def p_divassignment(_p):
     """assignment : ID DIVASSIGN cond"""
-    symtab[p[1]] /= p[3]
-    p[0] = symtab[p[1]]
 
 
 # -------------------------
 # Numeric and variables
 # -------------------------
 
-def p_var(p):
+def p_var(_p):
     """var : ID"""
-    val = symtab.get(p[1])
-    if val:
-        p[0] = val
-    else:
-        p[0] = 1
 
 
-def p_num(p):
+def p_num(_p):
     """num : INTNUM 
            | FLOATNUM
            | var"""
-    p[0] = p[1]
 
 
-def p_int_num_var(p):
+def p_int_num_var(_p):
     """int_num_var : INTNUM
                    | var"""
-    p[0] = p[1]
 
 
 # -------------------------
 # Unary operations
 # -------------------------
 
-def p_neg(p):
+def p_unary_op(_p):
+    """unary_op : neg_num
+                | transpose"""
+
+
+def p_neg(_p):
     """neg_num : '-' num %prec UMINUS"""
-    p[0] = -p[2]
 
 
-def p_transpose(p):
+def p_transpose(_p):
     """transpose : ID '\\'' """
-    p[0] = p[1]
 
 
 # -------------------------
 # Binary operations
 # -------------------------
 
-def p_operation_sum(p):
+def p_operation_sum(_p):
     """operation : operation '+' operation
                  | operation '-' operation"""
-    if p[2] == '+':
-        p[0] = p[1] + p[3]
-    else:
-        p[0] = p[1] - p[3]
 
 
-def p_operation_dot_sum(p):
+def p_operation_dot_sum(_p):
     """operation : operation DOTADD operation
                  | operation DOTSUB operation"""
-    if p[2] == '.+':
-        p[0] = p[1] + p[3]
-    else:
-        p[0] = p[1] - p[3]
 
 
-def p_operation_mul(p):
+def p_operation_mul(_p):
     """operation : operation '*' operation
                  | operation '/' operation"""
-    if p[2] == '*':
-        p[0] = p[1] * p[3]
-    else:
-        p[0] = p[1] / p[3]
 
 
-def p_operation_dot_mul(p):
+def p_operation_dot_mul(_p):
     """operation : operation DOTMUL operation
                  | operation DOTDIV operation"""
-    if p[2] == '.*':
-        p[0] = p[1] * p[3]
-    else:
-        p[0] = p[1] / p[3]
 
 
 # -------------------------
 # Binary comparisons operations
 # -------------------------
 
-def p_operation_cmp(p):
+def p_operation_cmp(_p):
     """cmp : operation '<' operation
            | operation '>' operation"""
-    if p[2] == '<':
-        p[0] = p[1] < p[3]
-    else:
-        p[0] = p[1] > p[3]
 
 
-def p_operation_cmp_eq(p):
+def p_operation_cmp_eq(_p):
     """cmp : operation EQ operation
            | operation NEQ operation"""
-    if p[2] == '==':
-        p[0] = p[1] == p[3]
-    else:
-        p[0] = p[1] != p[3]
 
 
-def p_operation_cmp_geq(p):
+def p_operation_cmp_geq(_p):
     """cmp : operation GEQ operation
            | operation LEQ operation"""
-    if p[2] == '>=':
-        p[0] = p[1] >= p[3]
-    else:
-        p[0] = p[1] <= p[3]
 
 
-def p_operation_group(p):
+def p_operation_group(_p):
     """operation : '(' operation ')'"""
-    p[0] = p[2]
 
 
 parser = yacc.yacc()
