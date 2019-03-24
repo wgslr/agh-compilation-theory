@@ -32,9 +32,9 @@ def p_error(p):
 # Main productions
 # -------------------------
 
-def p_mul_expressions(_p):
-    """mul_expressions : expression
-                       | expression mul_expressions"""
+def p_many_expressions(_p):
+    """many_expressions : expression
+                       | expression many_expressions"""
 
 
 def p_expr(_p):
@@ -63,7 +63,7 @@ def p_operation(_p):
 
 
 def p_block(_p):
-    """block : '{' mul_expressions '}'"""
+    """block : '{' many_expressions '}'"""
 
 
 def p_print(_p):
@@ -147,7 +147,7 @@ def p_for(_p):
 def p_loop_body(_p):
     """loop_body : loop_expr
                  | loop_expr ';'
-                 | '{' mul_loop_expr '}'"""
+                 | '{' many_loop_expr '}'"""
 
 
 def p_loop_expr(_p):
@@ -158,8 +158,8 @@ def p_loop_expr(_p):
                  | CONTINUE"""
 
 
-def p_mul_loop_expr(_p):
-    """mul_loop_expr : mul_loop_expr loop_body
+def p_many_loop_expr(_p):
+    """many_loop_expr : many_loop_expr loop_body
                      | loop_body"""
 
 
