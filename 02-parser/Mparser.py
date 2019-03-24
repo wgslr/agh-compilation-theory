@@ -15,6 +15,7 @@ precedence = (
     ("left", '*', '/'),
     ("left", 'DOTMUL', 'DOTDIV'),
     ('right', 'UMINUS'),
+    ('right', '\''),
 )
 
 
@@ -97,9 +98,15 @@ def p_neg(p):
     p[0] = -p[2]
 
 
+def p_transpose(p):
+    """transpose : ID '\\'' """
+    p[0] = p[1]
+
+
 def p_operation(p):
     """operation : num
-                 | neg_num"""
+                 | neg_num
+                 | transpose"""
     p[0] = p[1]
 
 
@@ -142,10 +149,6 @@ def p_operation_dot_mul(p):
 def p_operation_group(p):
     """operation : '(' operation ')'"""
     p[0] = p[2]
-
-
-# to finish the grammar
-# ....
 
 
 parser = yacc.yacc()
