@@ -39,15 +39,15 @@ def p_many_expressions(_p):
 
 def p_expr(_p):
     """expression : block
-                  | base_expr ';'
+                  | base_expr
                   | if_statement
                   | loop"""
 
 
 def p_base_expr(_p):
-    """base_expr : assignment
-                 | return
-                 | print"""
+    """base_expr : assignment ';'
+                 | return ';'
+                 | print ';'"""
 
 
 def p_cond(_p):
@@ -77,7 +77,7 @@ def p_print_body(_p):
 
 def p_return(_p):
     """return : RETURN cond
-              | RETURN ';'"""
+              | RETURN """
 
 
 # -------------------------
@@ -149,7 +149,7 @@ def p_loop_body(_p):
 
 
 def p_loop_expr(_p):
-    """loop_expr : base_expr ';'
+    """loop_expr : base_expr
                  | loop
                  | if_loop_statement
                  | BREAK
