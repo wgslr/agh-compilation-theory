@@ -39,7 +39,6 @@ def p_many_expressions(_p):
 
 def p_expr(_p):
     """expression : block
-                  | base_expr
                   | base_expr ';'
                   | if_statement
                   | loop"""
