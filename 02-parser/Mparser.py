@@ -146,12 +146,11 @@ def p_for(_p):
 
 def p_loop_body(_p):
     """loop_body : loop_expr
-                 | loop_expr ';'
                  | '{' many_loop_expr '}'"""
 
 
 def p_loop_expr(_p):
-    """loop_expr : base_expr
+    """loop_expr : base_expr ';'
                  | loop
                  | if_loop_statement
                  | BREAK
@@ -159,8 +158,8 @@ def p_loop_expr(_p):
 
 
 def p_many_loop_expr(_p):
-    """many_loop_expr : many_loop_expr loop_body
-                     | loop_body"""
+    """many_loop_expr : many_loop_expr loop_expr
+                     | loop_expr"""
 
 
 # -------------------------
