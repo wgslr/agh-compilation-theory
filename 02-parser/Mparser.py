@@ -18,7 +18,6 @@ precedence = (
     ("left", 'DOTMUL', 'DOTDIV'),
     ("right", 'UMINUS'),
     ("right", '\''),
-    # ("left", 'ELSE'),
 )
 
 
@@ -155,8 +154,8 @@ def p_loop_expr(_p):
     """loop_expr : base_expr
                  | loop
                  | if_loop_statement
-                 | BREAK
-                 | CONTINUE"""
+                 | BREAK ';'
+                 | CONTINUE ';'"""
 
 
 def p_many_loop_expr(_p):
