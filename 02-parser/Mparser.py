@@ -78,7 +78,7 @@ def p_print_body(_p):
 
 def p_return(_p):
     """return : RETURN cond
-              | RETURN"""
+              | RETURN ';'"""
 
 
 # -------------------------
