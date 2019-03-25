@@ -10,14 +10,14 @@ literals = scanner.literals
 precedence = (
     ('left', 'IF'),
     ('left', 'ELSE'),
-    ("right", '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
-    ("left", '<', '>', 'EQ', 'NEQ', 'GEQ', 'LEQ'),
-    ("left", '+', '-'),
-    ("left", 'DOTADD', 'DOTSUB'),
-    ("left", '*', '/'),
-    ("left", 'DOTMUL', 'DOTDIV'),
-    ("right", 'UMINUS'),
-    ("right", '\''),
+    ('right', '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
+    ('left', '<', '>', 'EQ', 'NEQ', 'GEQ', 'LEQ'),
+    ('left', '+', '-'),
+    ('left', 'DOTADD', 'DOTSUB'),
+    ('left', '*', '/'),
+    ('left', 'DOTMUL', 'DOTDIV'),
+    ('right', 'UMINUS'),
+    ('right', '\''),
 )
 
 
