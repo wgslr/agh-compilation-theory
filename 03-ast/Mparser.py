@@ -8,10 +8,10 @@ literals = scanner.literals
 
 
 precedence = (
-    ('left', 'IF'),
-    ('left', 'ELSE'),
+    ('nonassoc', 'IF'),
+    ('nonassoc', 'ELSE'),
     ('right', '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
-    ('left', '<', '>', 'EQ', 'NEQ', 'GEQ', 'LEQ'),
+    ('nonassoc', '<', '>', 'EQ', 'NEQ', 'GEQ', 'LEQ'),
     ('left', '+', '-'),
     ('left', 'DOTADD', 'DOTSUB'),
     ('left', '*', '/'),
