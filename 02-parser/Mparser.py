@@ -8,14 +8,17 @@ literals = scanner.literals
 
 
 precedence = (
+    ('left', 'IF'),
+    ('left', 'ELSE'),
     ("right", '=', 'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN'),
     ("left", '<', '>', 'EQ', 'NEQ', 'GEQ', 'LEQ'),
     ("left", '+', '-'),
     ("left", 'DOTADD', 'DOTSUB'),
     ("left", '*', '/'),
     ("left", 'DOTMUL', 'DOTDIV'),
-    ('right', 'UMINUS'),
-    ('right', '\''),
+    ("right", 'UMINUS'),
+    ("right", '\''),
+    # ("left", 'ELSE'),
 )
 
 
@@ -166,21 +169,13 @@ def p_many_loop_expr(_p):
 # -------------------------
 
 def p_if_statement(_p):
-    """if_statement : IF '(' cond ')' expression else_statement"""
-
-
-def p_else_statement(_p):
-    """else_statement : ELSE expression
-                      | empty"""
+    """if_statement : IF '(' cond ')' expression %prec IF
+                    | IF '(' cond ')' expression ELSE expression"""
 
 
 def p_if_loop_statement(_p):
-    """if_loop_statement : IF '(' cond ')' loop_body else_loop_statement"""
-
-
-def p_else_loop_statement(_p):
-    """else_loop_statement : ELSE loop_body
-                      | empty"""
+    """if_loop_statement : IF '(' cond ')' loop_body %prec IF
+       if_loop_statement : IF '(' cond ')' loop_body ELSE loop_body"""
 
 
 def p_empty(_p):
