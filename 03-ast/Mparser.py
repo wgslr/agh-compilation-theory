@@ -245,7 +245,7 @@ def p_neg(_p):
 
 
 def p_transpose(_p):
-    """transpose : ID '\\'' """
+    """transpose : operation '\\'' """
 
 
 # -------------------------
