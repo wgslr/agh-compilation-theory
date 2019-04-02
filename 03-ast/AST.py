@@ -24,7 +24,15 @@ class BinExpr(Node):
         self.op = op
         self.left = left
         self.right = right
+        print("Created ", self)
 
+    # TODO remove - use printTreee
+    def __repr__(self):
+        return "{} {} {}".format(self.left, self.op, self.right)
+
+
+class Assignment(BinExpr):
+    pass
 
 # ...
 # fill out missing classes
