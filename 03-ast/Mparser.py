@@ -256,25 +256,25 @@ def p_transpose(p):
 def p_operation_sum(p):
     """operation : operation '+' operation
                  | operation '-' operation"""
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
+    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
 
 
 def p_operation_dot_sum(p):
     """operation : operation DOTADD operation
                  | operation DOTSUB operation"""
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
+    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
 
 
 def p_operation_mul(p):
     """operation : operation '*' operation
                  | operation '/' operation"""
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
+    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
 
 
 def p_operation_dot_mul(p):
     """operation : operation DOTMUL operation
                  | operation DOTDIV operation"""
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
+    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
 
 
 # -------------------------
@@ -284,20 +284,24 @@ def p_operation_dot_mul(p):
 def p_operation_cmp(p):
     """cmp : operation '<' operation
            | operation '>' operation"""
+    p[0] = AST.Comparison(p[2], p[1], p[3])
 
 
 def p_operation_cmp_eq(p):
     """cmp : operation EQ operation
            | operation NEQ operation"""
+    p[0] = AST.Comparison(p[2], p[1], p[3])
 
 
 def p_operation_cmp_geq(p):
     """cmp : operation GEQ operation
            | operation LEQ operation"""
+    p[0] = AST.Comparison(p[2], p[1], p[3])
 
 
 def p_operation_group(p):
     """operation : '(' operation ')'"""
+    p[0] = p[2]
 
 
 scanner = scanner.lexer

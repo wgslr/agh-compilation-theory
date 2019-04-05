@@ -9,7 +9,6 @@ class IntNum(Node):
         self.value = value
 
 class FloatNum(Node):
-
     def __init__(self, value):
         self.value = value
 
@@ -24,7 +23,6 @@ class BinExpr(Node):
         self.op = op
         self.left = left
         self.right = right
-        print("Created ", self)
 
     # TODO remove - use printTreee
     def __repr__(self):
@@ -32,6 +30,12 @@ class BinExpr(Node):
 
 
 class Assignment(BinExpr):
+    pass
+
+class Comparison(BinExpr):
+    pass
+
+class ArithemticOperation(BinExpr):
     pass
 
 # ...
