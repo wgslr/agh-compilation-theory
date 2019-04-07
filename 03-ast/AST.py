@@ -11,10 +11,7 @@ class Instructions(Node):
 
 class Print(Node):
     def __init__(self, arguments):
-        if isinstance(arguments, list):
-            self.arguments = arguments
-        else:
-            self.arguments = [arguments]
+        self.arguments = arguments
 
 
 class Return(Node):
@@ -22,6 +19,18 @@ class Return(Node):
         """argument may be None for return statement
         without a return value"""
         self.value = value
+
+
+class For(Node):
+    def __init__(self, iterator, start, end, body):
+        self.iterator = iterator
+        self.range = Range(start, end)
+        self.body = body
+
+class Range(Node):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
 
 
 class FunctionCall(Node):
@@ -39,6 +48,10 @@ class IntNum(Node):
     def __init__(self, value):
         self.value = value
 
+
+class String(Node):
+    def __init__(self, value):
+        self.value = value
 
 class FloatNum(Node):
     def __init__(self, value):

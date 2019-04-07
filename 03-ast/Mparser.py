@@ -74,20 +74,24 @@ def p_expression(p):
 def p_block(p):
     """block : '{' instructions '}'
              | '{' error '}'"""
-    p[0] = p[1]
+    p[0] = p[2]
 
 
 def p_print(p):
     """print : PRINT print_body"""
-    p[0] = p[1]
+    p[0] = AST.Print(p[2])
 
 
 def p_print_body(p):
-    """print_body : STRING
+    """print_body : string
                   | expression
-                  | STRING ',' print_body
+                  | string ',' print_body
                   | expression ',' print_body"""
-    p[0] = AST.Print([x for x in p[1:] if x != ','])
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = p[3]
+        p[0] = [p[1]] + p[0]
 
 
 def p_return(p):
@@ -99,6 +103,9 @@ def p_return(p):
         p[0] = AST.Return(p[2])
 
 
+def p_string(p):
+    """string : STRING"""
+    p[0] = AST.String(p[1])
 
 # -------------------------
 # Matrices
@@ -177,6 +184,7 @@ def p_fun_name(p):
 def p_loop(p):
     """loop : while
             | for"""
+    p[0] = p[1]
 
 
 def p_while(p):
@@ -185,6 +193,7 @@ def p_while(p):
 
 def p_for(p):
     """for : FOR ID '=' numeric_expression ':' numeric_expression instruction"""
+    p[0] = AST.For(AST.Variable(p[2]), p[4], p[6], p[7])
 
 
 # -------------------------
@@ -208,7 +217,7 @@ def p_assignment_lhs(p):
 
 def p_assignment(p):
     """assignment : assignment_lhs assignment_operator expression
-                  | assignment_lhs '=' STRING"""
+                  | assignment_lhs '=' string"""
     p[0] = AST.Assignment(p[2], p[1], p[3])
     
 
@@ -260,12 +269,12 @@ def p_unary_op(p):
 
 def p_neg(p):
     """negation : '-' numeric_expression %prec UMINUS"""
-    p[0] = AST.UnaryExpr(p[2], p[3])
+    p[0] = AST.UnaryExpr('NEGATE', p[2])
 
 
 def p_transposition(p):
     r"""transposition : numeric_expression '\''"""
-    p[0] = AST.UnaryExpr(p[3], p[2])
+    p[0] = AST.UnaryExpr('TRANSPOSE', p[1])
 
 
 def p_numeric_expression(p):
