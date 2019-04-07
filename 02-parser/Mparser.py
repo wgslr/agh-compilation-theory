@@ -57,7 +57,6 @@ def p_statement(p):
 def p_expression(p):
     """expression : comparison_expression
                   | numeric_expression"""
-    p[0] = p[1]
 
 
 def p_block(p):
@@ -162,7 +161,6 @@ def p_conditional(p):
 def p_assignment_lhs(p):
     """assignment_lhs : ID
                 | array_range"""
-    p[0] = p[1]
 
 
 def p_assignment(p):
