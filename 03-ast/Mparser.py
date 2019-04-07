@@ -39,6 +39,7 @@ def p_error(p):
 def p_instructions(p):
     """instructions : instruction
                     | instruction instructions"""
+    p[0] = AST.Instructions(p[1:])
 
 
 def p_instruction(p):
@@ -47,6 +48,7 @@ def p_instruction(p):
                    | loop
                    | statement ';'
                    | error ';'"""
+    p[0] = p[1]
 
 
 def p_statement(p):
@@ -55,20 +57,24 @@ def p_statement(p):
                  | print
                  | BREAK
                  | CONTINUE"""
+    p[0] = p[1]
 
 
 def p_expression(p):
     """expression : comparison_expression
                   | numeric_expression"""
+    p[0] = p[1]
 
 
 def p_block(p):
     """block : '{' instructions '}'
              | '{' error '}'"""
+    p[0] = p[1]
 
 
 def p_print(p):
     """print : PRINT print_body"""
+    p[0] = p[1]
 
 
 def p_print_body(p):
@@ -76,11 +82,17 @@ def p_print_body(p):
                   | expression
                   | STRING ',' print_body
                   | expression ',' print_body"""
+    p[0] = AST.Print([x for x in p[1:] if x != ','])
 
 
 def p_return(p):
     """return : RETURN expression
               | RETURN"""
+    if len(p) == 2:
+        p[0] = AST.Return()
+    else:
+        p[0] = AST.Return(p[2])
+
 
 
 def p_empty(p):
@@ -90,14 +102,18 @@ def p_empty(p):
 # Matrices
 # -------------------------
 
+
 def p_vector(p):
     """vector : '[' vector_body ']'"""
+    # TODO
+    print("vector: ", p[1:])
 
 
 def p_vector_body(p):
     """vector_body : numeric_expression
                    | vector_body ',' numeric_expression
                    | empty"""
+    print("vector_body: ", p[1:])
 
 
 def p_matrix(p):
@@ -125,12 +141,14 @@ def p_array_range(p):
 def p_fun(p):
     """fun : fun_name '(' numeric_expression ')'
            | fun_name '(' error ')'"""
+    p[0] = AST.FunctionCall(p[1], p[3])
 
 
 def p_fun_name(p):
     """fun_name : ZEROS
                 | ONES
                 | EYE"""
+    p[0] = p[1]
 
 
 # -------------------------
@@ -194,6 +212,12 @@ def p_num(p):
     """num : INTNUM
            | FLOATNUM
            | var"""
+    if isinstance(p[1], int):
+        p[0] = AST.IntNum(p[1])
+    if isinstance(p[1], float):
+        p[0] = AST.FloatNum(p[1])
+    else:
+        p[0] = p[1]
 
 
 # -------------------------
@@ -203,14 +227,17 @@ def p_num(p):
 def p_unary_op(p):
     """unary_op : negation
                 | transposition"""
+    p[0] = p[1]
 
 
 def p_neg(p):
     """negation : '-' numeric_expression %prec UMINUS"""
+    p[0] = AST.UnaryExpr(p[2], p[3])
 
 
 def p_transposition(p):
     r"""transposition : numeric_expression '\''"""
+    p[0] = AST.UnaryExpr(p[3], p[2])
 
 
 def p_numeric_expression(p):
@@ -219,6 +246,11 @@ def p_numeric_expression(p):
                           | unary_op
                           | fun
                           | '(' numeric_expression ')'"""
+    if p[1] == '(':
+        p[0] = p[2]
+    else:
+        p[0] = p[1]
+
 
 def p_bin_numeric_expression(p):
     """numeric_expression : numeric_expression '+' numeric_expression
@@ -229,6 +261,7 @@ def p_bin_numeric_expression(p):
                           | numeric_expression DOTSUB numeric_expression
                           | numeric_expression DOTMUL numeric_expression
                           | numeric_expression DOTDIV numeric_expression"""
+    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
 
 
 # -------------------------
@@ -243,7 +276,12 @@ def p_comparison_expression(p):
            | numeric_expression GEQ numeric_expression
            | numeric_expression LEQ numeric_expression
            | '(' comparison_expression ')'"""
+    if p[1] == '(':
+        p[0] = p[2]
+    else:
+        p[0] = AST.Comparison(p[2], p[1], p[3])
 
 
+# TODO Fix "Lexer instance has no attribute 'find_column'"
 scanner = scanner.lexer
 parser = yacc.yacc()

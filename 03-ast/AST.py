@@ -4,6 +4,31 @@ class Node(object):
     pass
 
 
+class Instructions(Node):
+    def __init__(self, nodes):
+        self.nodes = nodes
+
+
+class Print(Node):
+    def __init__(self, arguments):
+        if isinstance(arguments, list):
+            self.arguments = arguments
+        else:
+            self.arguments = [arguments]
+
+
+class Return(Node):
+    def __init__(self, value = None):
+        """argument may be None for return statement
+        without a return value"""
+        self.value = value
+
+
+class FunctionCall(Node):
+    def __init__(self, func_name, argument):
+        self.name = func_name
+        self.argument = argument
+
 class IntNum(Node):
     def __init__(self, value):
         self.value = value
@@ -16,6 +41,12 @@ class FloatNum(Node):
 class Variable(Node):
     def __init__(self, name):
         self.name = name
+
+
+class UnaryExpr(Node):
+    def __init__(self, operation, operand):
+        self.operation = operation
+        self.operand = operand
 
 
 class BinExpr(Node):
@@ -38,10 +69,6 @@ class Comparison(BinExpr):
 
 class ArithemticOperation(BinExpr):
     pass
-
-# ...
-# fill out missing classes
-# ...
 
 class Error(Node):
     def __init__(self):
