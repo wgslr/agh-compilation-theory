@@ -23,6 +23,7 @@ class BinExpr(Node):
         self.op = op
         self.left = left
         self.right = right
+        print("Created:\n", self.printTree(2))
 
     # TODO remove - use printTreee
     def __repr__(self):

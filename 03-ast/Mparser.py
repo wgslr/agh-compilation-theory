@@ -220,16 +220,23 @@ def p_var(p):
 
 
 def p_num(p):
-    """num : INTNUM 
+    """num : INTNUM
            | FLOATNUM
            | var"""
-    p[0] = p[1]
+    if isinstance(p[1], int):
+        p[0] = AST.IntNum(p[1])
+    elif isinstance(p[1], float):
+        p[0] = AST.FloatNum(p[1])
+    else:
+        p[0] = p[1]
 
 
 def p_int_num_var(p):
     """int_num_var : INTNUM
                    | var"""
     p[0] = p[1]
+
+    sel.printTree(3)
 
 
 # -------------------------

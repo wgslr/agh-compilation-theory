@@ -17,8 +17,7 @@ class TreePrinter:
 
     @addToClass(AST.IntNum)
     def printTree(self, indent=0):
-        pass
-        # fill in the body
+        print(makeIndent(indent) + self.value)
 
 
     @addToClass(AST.Error)
@@ -26,6 +25,15 @@ class TreePrinter:
         pass    
         # fill in the body
 
+
+    @addToClass(AST.ArithemticOperation)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + "{} {} {}".format(self.left, self.op, self.right))
+
+
+    @classmethod
+    def makeIndent(_self, indent):
+        return ''.join("|  " * indent)
 
     # define printTree for other classes
     # ...
