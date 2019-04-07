@@ -43,7 +43,8 @@ def p_instruction(p):
     """instruction : block
                    | conditional
                    | loop
-                   | statement ';'"""
+                   | statement ';'
+                   | error ';'"""
 
 
 def p_statement(p):
@@ -60,7 +61,8 @@ def p_expression(p):
 
 
 def p_block(p):
-    """block : '{' instructions '}'"""
+    """block : '{' instructions '}'
+             | '{' error '}'"""
 
 
 def p_print(p):
@@ -119,7 +121,8 @@ def p_array_range(p):
 # -------------------------
 
 def p_fun(p):
-    """fun : fun_name '(' numeric_expression ')'"""
+    """fun : fun_name '(' numeric_expression ')'
+           | fun_name '(' error ')'"""
 
 
 def p_fun_name(p):
@@ -160,7 +163,7 @@ def p_conditional(p):
 
 def p_assignment_lhs(p):
     """assignment_lhs : ID
-                | array_range"""
+                      | array_range"""
 
 
 def p_assignment(p):
