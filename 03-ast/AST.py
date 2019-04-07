@@ -70,7 +70,7 @@ class Comparison(BinExpr):
     pass
 
 
-class ArithemticOperation(BinExpr):
+class ArithmeticOperation(BinExpr):
     pass
 
 

@@ -46,10 +46,15 @@ class TreePrinter:
         pass
         # fill in the body
 
-    @addToClass(AST.ArithemticOperation)
+    @addToClass(AST.BinExpr)
     def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) +
-              "{} {} {}".format(self.left, self.op, self.right))
+        print(TreePrinter.makeIndent(indent) + self.op)
+        self.left.printTree(indent + 1)
+        self.right.printTree(indent + 1)
+
+    @addToClass(AST.ArithmeticOperation)
+    def printTree(self, indent=0):
+        AST.BinExpr.printTree(self, indent)
 
     @classmethod
     def makeIndent(_self, indent):

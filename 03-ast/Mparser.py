@@ -40,7 +40,6 @@ def p_error(p):
 def p_instructions(p):
     """instructions : instruction
                     | instruction instructions"""
-    # fixme will not work as expected
     if len(p) == 2:
         p[0] = AST.Instructions([p[1]])
     else:
@@ -270,7 +269,7 @@ def p_bin_numeric_expression(p):
                           | numeric_expression DOTSUB numeric_expression
                           | numeric_expression DOTMUL numeric_expression
                           | numeric_expression DOTDIV numeric_expression"""
-    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
+    p[0] = AST.ArithmeticOperation(p[2], p[1], p[3])
 
 
 # -------------------------
