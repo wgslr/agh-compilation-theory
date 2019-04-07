@@ -89,23 +89,23 @@ def p_empty(p):
 # -------------------------
 
 def p_vector(p):
-    """vector : '[' vector_body ']'"""
+    """vector : '[' vector_body ']'
+              | '[' ']'"""
 
 
 def p_vector_body(p):
     """vector_body : numeric_expression
-                   | vector_body ',' numeric_expression
-                   | empty"""
+                   | vector_body ',' numeric_expression"""
 
 
 def p_matrix(p):
-    """matrix : '[' matrix_body ']'"""
+    """matrix : '[' matrix_body ']'
+              | '[' ']'"""
 
 
 def p_matrix_body(p):
     """matrix_body : vector
-                   | matrix_body ',' vector
-                   | empty"""
+                   | matrix_body ',' vector"""
 
 
 # -------------------------
