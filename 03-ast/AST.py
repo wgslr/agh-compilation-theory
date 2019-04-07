@@ -30,6 +30,11 @@ class FunctionCall(Node):
         self.argument = argument
 
 
+class Vector(Node):
+    def __init__(self, elements):
+        self.elements = elements
+
+
 class IntNum(Node):
     def __init__(self, value):
         self.value = value
@@ -43,6 +48,14 @@ class FloatNum(Node):
 class Variable(Node):
     def __init__(self, name):
         self.name = name
+
+
+class Reference(Node):
+    """A matrix cell reference"""
+
+    def __init__(self, name, coords):
+        self.name = name
+        self.coords = coords
 
 
 class UnaryExpr(Node):

@@ -28,9 +28,22 @@ class TreePrinter:
         self.left.printTree(indent + 1)
         self.right.printTree(indent + 1)
 
+    @addToClass(AST.Vector)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + "VECTOR")
+        for e in self.elements:
+            e.printTree(indent + 1)
+
     @addToClass(AST.Variable)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + self.name)
+
+    @addToClass(AST.Reference)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + "REF")
+        self.name.printTree(indent + 1)
+        for c in self.coords:
+            c.printTree(indent + 1)
 
     @addToClass(AST.FunctionCall)
     def printTree(self, indent=0):
@@ -44,7 +57,7 @@ class TreePrinter:
     @addToClass(AST.Error)
     def printTree(self, indent=0):
         pass
-        # fill in the body
+        # TODO fill in the body
 
     @addToClass(AST.BinExpr)
     def printTree(self, indent=0):

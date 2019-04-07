@@ -108,21 +108,40 @@ def p_return(p):
 def p_vector(p):
     """vector : '[' vector_body ']'
               | '[' ']'"""
+    if len(p) == 3:
+        p[0] = AST.Vector([])
+    else:
+        p[0] = AST.Vector(p[2])
+        
 
 
 def p_vector_body(p):
     """vector_body : numeric_expression
                    | vector_body ',' numeric_expression"""
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = p[1]
+        p[0] += [p[3]]
 
 
 def p_matrix(p):
     """matrix : '[' matrix_body ']'
               | '[' ']'"""
+    if len(p) == 3:
+        p[0] = AST.Vector([])
+    else:
+        p[0] = AST.Vector(p[2])
 
 
 def p_matrix_body(p):
     """matrix_body : vector
                    | matrix_body ',' vector"""
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = p[1]
+        p[0] += [p[3]]
 
 
 # -------------------------
@@ -131,6 +150,7 @@ def p_matrix_body(p):
 
 def p_array_range(p):
     """array_range : ID '[' expression ',' expression ']'"""
+    p[0] = AST.Reference(AST.Variable(p[1]), [p[3], p[5]])
 
 
 # -------------------------
