@@ -159,23 +159,23 @@ def p_conditional(p):
 # Assignments
 # -------------------------
 
-def p_assignee(p):
-    """assignee : ID
+def p_assignment_lhs(p):
+    """assignment_lhs : ID
                 | array_range"""
     p[0] = p[1]
 
 
 def p_assignment(p):
-    """assignment : assignee '=' expression
-                  | assignee '=' matrix
-                  | assignee '=' STRING"""
+    """assignment : assignment_lhs assignment_operator expression
+                  | assignment_lhs '=' STRING"""
 
 
-def p_opassignment(p):
-    """assignment : assignee ADDASSIGN expression
-                  | assignee SUBASSIGN expression
-                  | assignee MULASSIGN expression
-                  | ID DIVASSIGN expression"""
+def p_assignment_operator(p):
+    """assignment_operator : '='
+                           | ADDASSIGN
+                           | SUBASSIGN
+                           | MULASSIGN
+                           | DIVASSIGN"""
 
 
 # -------------------------
