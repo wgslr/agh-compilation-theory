@@ -29,6 +29,23 @@ class TreePrinter:
         self.range.printTree(indent + 1)
         self.body.printTree(indent + 1)
 
+    @addToClass(AST.While)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + 'WHILE')
+        self.condition.printTree(indent + 1)
+        self.body.printTree(indent + 1)
+
+    @addToClass(AST.If)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + 'IF')
+        self.condition.printTree(indent + 1)
+        print(TreePrinter.makeIndent(indent) + 'THEN')
+        self.body.printTree(indent + 1)
+        if self.else_body is not None:
+            print(TreePrinter.makeIndent(indent) + 'ELSE')
+            self.else_body.printTree(indent + 1)
+
+
     @addToClass(AST.Print)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + 'PRINT')

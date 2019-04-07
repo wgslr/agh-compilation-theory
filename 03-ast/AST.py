@@ -27,6 +27,17 @@ class For(Node):
         self.range = Range(start, end)
         self.body = body
 
+class While(Node):
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+
+class If(Node):
+    def __init__(self, condition, body, else_body = None):
+        self.condition = condition
+        self.body = body
+        self.else_body = else_body
+
 class Range(Node):
     def __init__(self, start, end):
         self.start = start

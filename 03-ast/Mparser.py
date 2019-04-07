@@ -189,6 +189,7 @@ def p_loop(p):
 
 def p_while(p):
     """while : WHILE '(' expression ')' instruction"""
+    p[0] = AST.While(p[3], p[5])
 
 
 def p_for(p):
@@ -203,6 +204,11 @@ def p_for(p):
 def p_conditional(p):
     """conditional : IF '(' expression ')' instruction %prec IF
                    | IF '(' expression ')' instruction ELSE instruction"""
+    if len(p) == 6:
+        else_body = None
+    else:
+        else_body = p[7]
+    p[0] = AST.If(p[3], p[5], else_body)
 
 
 # -------------------------
