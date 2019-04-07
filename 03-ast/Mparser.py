@@ -36,39 +36,35 @@ def p_error(p):
 # Main productions
 # -------------------------
 
-def p_many_expressions(p):
-    """many_expressions : expression
-                       | expression many_expressions"""
+def p_instructions(p):
+    """instructions : instruction
+                    | instruction instructions"""
 
 
-def p_expr(p):
-    """expression : block
-                  | base_expr
-                  | if_statement
-                  | loop"""
+def p_instruction(p):
+    """instruction : block
+                   | conditional
+                   | loop
+                   | statement ';'
+                   | error ';'"""
 
 
-def p_base_expr(p):
-    """base_expr : assignment ';'
-                 | return ';'
-                 | print ';'"""
+def p_statement(p):
+    """statement : assignment
+                 | return
+                 | print
+                 | BREAK
+                 | CONTINUE"""
 
 
-def p_cond(p):
-    """cond : cmp
-            | operation"""
-    p[0] = p[1]
-
-
-def p_operation(p):
-    """operation : num
-                 | unary_op
-                 | fun"""
-    p[0] = p[1]
+def p_expression(p):
+    """expression : comparison_expression
+                  | numeric_expression"""
 
 
 def p_block(p):
-    """block : '{' many_expressions '}'"""
+    """block : '{' instructions '}'
+             | '{' error '}'"""
 
 
 def p_print(p):
@@ -77,14 +73,18 @@ def p_print(p):
 
 def p_print_body(p):
     """print_body : STRING
-                  | cond
-                  | print_body ',' cond"""
+                  | expression
+                  | STRING ',' print_body
+                  | expression ',' print_body"""
 
 
 def p_return(p):
-    """return : RETURN cond
-              | RETURN """
+    """return : RETURN expression
+              | RETURN"""
 
+
+def p_empty(p):
+    """empty : """
 
 # -------------------------
 # Matrices
@@ -95,8 +95,8 @@ def p_vector(p):
 
 
 def p_vector_body(p):
-    """vector_body : num
-                   | vector_body ',' num
+    """vector_body : numeric_expression
+                   | vector_body ',' numeric_expression
                    | empty"""
 
 
@@ -115,7 +115,7 @@ def p_matrix_body(p):
 # -------------------------
 
 def p_array_range(p):
-    """array_range : ID '[' int_num_var ',' int_num_var ']'"""
+    """array_range : ID '[' expression ',' expression ']'"""
 
 
 # -------------------------
@@ -123,7 +123,8 @@ def p_array_range(p):
 # -------------------------
 
 def p_fun(p):
-    """fun : fun_name '(' num ')'"""
+    """fun : fun_name '(' numeric_expression ')'
+           | fun_name '(' error ')'"""
 
 
 def p_fun_name(p):
@@ -142,173 +143,106 @@ def p_loop(p):
 
 
 def p_while(p):
-    """while : WHILE '(' cond ')' loop_body"""
+    """while : WHILE '(' expression ')' instruction"""
 
 
 def p_for(p):
-    """for : FOR var '=' int_num_var ':' int_num_var loop_body"""
-
-
-def p_loop_body(p):
-    """loop_body : loop_expr
-                 | '{' many_loop_expr '}'"""
-
-
-def p_loop_expr(p):
-    """loop_expr : base_expr
-                 | loop
-                 | if_loop_statement
-                 | BREAK ';'
-                 | CONTINUE ';'"""
-
-
-def p_many_loop_expr(p):
-    """many_loop_expr : many_loop_expr loop_expr
-                     | loop_expr"""
+    """for : FOR ID '=' numeric_expression ':' numeric_expression instruction"""
 
 
 # -------------------------
 # If statements
 # -------------------------
 
-def p_if_statement(p):
-    """if_statement : IF '(' cond ')' expression %prec IF
-                    | IF '(' cond ')' expression ELSE expression"""
-
-
-def p_if_loop_statement(p):
-    """if_loop_statement : IF '(' cond ')' loop_body %prec IF
-       if_loop_statement : IF '(' cond ')' loop_body ELSE loop_body"""
-
-
-def p_empty(p):
-    """empty : """
+def p_conditional(p):
+    """conditional : IF '(' expression ')' instruction %prec IF
+                   | IF '(' expression ')' instruction ELSE instruction"""
 
 
 # -------------------------
 # Assignments
 # -------------------------
 
-def p_assignee(p):
-    """assignee : ID
-                | array_range"""
-    p[0] = p[1]
+def p_assignment_lhs(p):
+    """assignment_lhs : ID
+                      | array_range"""
 
 
 def p_assignment(p):
-    """assignment : assignee '=' cond
-                  | assignee '=' matrix
-                  | assignee '=' STRING"""
-    p[0] = AST.Assignment(p[2], p[1], p[3])
+    """assignment : assignment_lhs assignment_operator expression
+                  | assignment_lhs '=' STRING"""
 
 
-def p_opassignment(p):
-    """assignment : assignee ADDASSIGN cond
-                  | assignee SUBASSIGN cond
-                  | assignee MULASSIGN cond
-                  | ID DIVASSIGN cond"""
-    p[0] = AST.Assignment(p[2], p[1], p[3])
+def p_assignment_operator(p):
+    """assignment_operator : '='
+                           | ADDASSIGN
+                           | SUBASSIGN
+                           | MULASSIGN
+                           | DIVASSIGN"""
 
 
 # -------------------------
-# Numeric and variables
+# Numerics and variables
 # -------------------------
 
 def p_var(p):
-    """var : ID"""
-    p[0] = AST.Variable()
+    """var : ID
+           | var '[' numeric_expression ']'"""
 
 
 def p_num(p):
     """num : INTNUM
            | FLOATNUM
            | var"""
-    if isinstance(p[1], int):
-        p[0] = AST.IntNum(p[1])
-    elif isinstance(p[1], float):
-        p[0] = AST.FloatNum(p[1])
-    else:
-        p[0] = p[1]
-
-
-def p_int_num_var(p):
-    """int_num_var : INTNUM
-                   | var"""
-    p[0] = p[1]
-
-    sel.printTree(3)
 
 
 # -------------------------
-# Unary operations
+# Numeric expressions
 # -------------------------
 
 def p_unary_op(p):
-    """unary_op : neg_num
-                | transpose"""
+    """unary_op : negation
+                | transposition"""
 
 
 def p_neg(p):
-    """neg_num : '-' num %prec UMINUS"""
+    """negation : '-' numeric_expression %prec UMINUS"""
 
 
-def p_transpose(p):
-    """transpose : operation '\\'' """
+def p_transposition(p):
+    r"""transposition : numeric_expression '\''"""
 
 
-# -------------------------
-# Binary operations
-# -------------------------
+def p_numeric_expression(p):
+    """numeric_expression : num
+                          | matrix
+                          | unary_op
+                          | fun
+                          | '(' numeric_expression ')'"""
 
-def p_operation_sum(p):
-    """operation : operation '+' operation
-                 | operation '-' operation"""
-    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
-
-
-def p_operation_dot_sum(p):
-    """operation : operation DOTADD operation
-                 | operation DOTSUB operation"""
-    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
-
-
-def p_operation_mul(p):
-    """operation : operation '*' operation
-                 | operation '/' operation"""
-    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
-
-
-def p_operation_dot_mul(p):
-    """operation : operation DOTMUL operation
-                 | operation DOTDIV operation"""
-    p[0] = AST.ArithemticOperation(p[2], p[1], p[3])
+def p_bin_numeric_expression(p):
+    """numeric_expression : numeric_expression '+' numeric_expression
+                          | numeric_expression '-' numeric_expression
+                          | numeric_expression '*' numeric_expression
+                          | numeric_expression '/' numeric_expression
+                          | numeric_expression DOTADD numeric_expression
+                          | numeric_expression DOTSUB numeric_expression
+                          | numeric_expression DOTMUL numeric_expression
+                          | numeric_expression DOTDIV numeric_expression"""
 
 
 # -------------------------
-# Binary comparisons operations
+# Binary comparisons expressions
 # -------------------------
 
-def p_operation_cmp(p):
-    """cmp : operation '<' operation
-           | operation '>' operation"""
-    p[0] = AST.Comparison(p[2], p[1], p[3])
-
-
-def p_operation_cmp_eq(p):
-    """cmp : operation EQ operation
-           | operation NEQ operation"""
-    p[0] = AST.Comparison(p[2], p[1], p[3])
-
-
-def p_operation_cmp_geq(p):
-    """cmp : operation GEQ operation
-           | operation LEQ operation"""
-    p[0] = AST.Comparison(p[2], p[1], p[3])
-
-
-def p_operation_group(p):
-    """operation : '(' operation ')'"""
-    p[0] = p[2]
+def p_comparison_expression(p):
+    """comparison_expression : numeric_expression '<' numeric_expression
+           | numeric_expression '>' numeric_expression
+           | numeric_expression EQ numeric_expression
+           | numeric_expression NEQ numeric_expression
+           | numeric_expression GEQ numeric_expression
+           | numeric_expression LEQ numeric_expression
+           | '(' comparison_expression ')'"""
 
 
 scanner = scanner.lexer
