@@ -80,10 +80,6 @@ def p_return(p):
     """return : RETURN expression
               | RETURN"""
 
-
-def p_empty(p):
-    """empty : """
-
 # -------------------------
 # Matrices
 # -------------------------
