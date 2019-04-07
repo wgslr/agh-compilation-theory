@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import scanner
 import ply.yacc as yacc
 
@@ -39,7 +40,12 @@ def p_error(p):
 def p_instructions(p):
     """instructions : instruction
                     | instruction instructions"""
-    p[0] = AST.Instructions(p[1:])
+    # fixme will not work as expected
+    if len(p) == 2:
+        p[0] = AST.Instructions([p[1]])
+    else:
+        p[0] = p[2]
+        p[0].nodes = [p[1]] + p[0].nodes
 
 
 def p_instruction(p):
@@ -176,13 +182,16 @@ def p_conditional(p):
 # -------------------------
 
 def p_assignment_lhs(p):
-    """assignment_lhs : ID
+    """assignment_lhs : var
                       | array_range"""
+    p[0] = p[1]
 
 
 def p_assignment(p):
     """assignment : assignment_lhs assignment_operator expression
                   | assignment_lhs '=' STRING"""
+    p[0] = AST.Assignment(p[2], p[1], p[3])
+    
 
 
 def p_assignment_operator(p):
@@ -191,6 +200,7 @@ def p_assignment_operator(p):
                            | SUBASSIGN
                            | MULASSIGN
                            | DIVASSIGN"""
+    p[0] = p[1]
 
 
 # -------------------------
@@ -200,15 +210,20 @@ def p_assignment_operator(p):
 def p_var(p):
     """var : ID
            | var '[' numeric_expression ']'"""
+    if len(p) == 2:
+        p[0] = AST.Variable(p[1])
+    else:
+        # TODO
+        pass
 
 
 def p_num(p):
     """num : INTNUM
            | FLOATNUM
            | var"""
-    if isinstance(p[1], int):
+    if isinstance(p[1], (int, long)):
         p[0] = AST.IntNum(p[1])
-    if isinstance(p[1], float):
+    elif isinstance(p[1], float):
         p[0] = AST.FloatNum(p[1])
     else:
         p[0] = p[1]

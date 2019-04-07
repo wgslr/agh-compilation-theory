@@ -18,7 +18,7 @@ class Print(Node):
 
 
 class Return(Node):
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         """argument may be None for return statement
         without a return value"""
         self.value = value
@@ -29,9 +29,11 @@ class FunctionCall(Node):
         self.name = func_name
         self.argument = argument
 
+
 class IntNum(Node):
     def __init__(self, value):
         self.value = value
+
 
 class FloatNum(Node):
     def __init__(self, value):
@@ -54,7 +56,6 @@ class BinExpr(Node):
         self.op = op
         self.left = left
         self.right = right
-        print("Created:\n", self.printTree(2))
 
     # TODO remove - use printTreee
     def __repr__(self):
@@ -64,13 +65,20 @@ class BinExpr(Node):
 class Assignment(BinExpr):
     pass
 
+
 class Comparison(BinExpr):
     pass
+
 
 class ArithemticOperation(BinExpr):
     pass
 
+
+class Variable(Node):
+    def __init__(self, name):
+        self.name = name
+
+
 class Error(Node):
     def __init__(self):
         pass
-      
