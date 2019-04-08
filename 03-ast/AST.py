@@ -27,16 +27,19 @@ class For(Node):
         self.range = Range(start, end)
         self.body = body
 
+
 class While(Node):
     def __init__(self, condition, body):
         self.condition = condition
         self.body = body
 
+
 class If(Node):
-    def __init__(self, condition, body, else_body = None):
+    def __init__(self, condition, body, else_body=None):
         self.condition = condition
         self.body = body
         self.else_body = else_body
+
 
 class Range(Node):
     def __init__(self, start, end):
@@ -63,6 +66,7 @@ class IntNum(Node):
 class String(Node):
     def __init__(self, value):
         self.value = value
+
 
 class FloatNum(Node):
     def __init__(self, value):
@@ -93,6 +97,7 @@ class BinExpr(Node):
         self.op = op
         self.left = left
         self.right = right
+
 
 class Assignment(BinExpr):
     pass

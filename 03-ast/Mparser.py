@@ -26,6 +26,7 @@ precedence = (
 
 def p_error(p):
     if p:
+        # using lexer object for convenient global state store
         p.lexer.encountered_error = True
         print("Syntax error at line {0}, column {1}: LexToken({2}, '{3}')"
               .format(p.lineno, scanner.find_column(p.lexer.lexdata, p),
@@ -120,7 +121,6 @@ def p_vector(p):
         p[0] = AST.Vector([])
     else:
         p[0] = AST.Vector(p[2])
-        
 
 
 def p_vector_body(p):
@@ -226,7 +226,6 @@ def p_assignment(p):
     """assignment : assignment_lhs assignment_operator expression
                   | assignment_lhs '=' string"""
     p[0] = AST.Assignment(p[2], p[1], p[3])
-    
 
 
 def p_assignment_operator(p):
