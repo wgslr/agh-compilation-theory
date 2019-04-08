@@ -9,6 +9,11 @@ class Instructions(Node):
         self.nodes = nodes
 
 
+class FlowKeyword(Node):
+    def __init__(self, keyword):
+        self.keyword = keyword.upper()
+
+
 class Print(Node):
     def __init__(self, arguments):
         self.arguments = arguments

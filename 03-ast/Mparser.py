@@ -60,11 +60,16 @@ def p_instruction(p):
 
 def p_statement(p):
     """statement : assignment
+                 | flow_keyword
                  | return
-                 | print
-                 | BREAK
-                 | CONTINUE"""
+                 | print"""
     p[0] = p[1]
+
+
+def p_flow_keyword(p):
+    """flow_keyword : BREAK
+                    | CONTINUE"""
+    p[0] = AST.FlowKeyword(p[1])
 
 
 def p_expression(p):

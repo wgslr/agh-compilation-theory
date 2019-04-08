@@ -22,6 +22,10 @@ class TreePrinter:
         for n in self.nodes:
             n.printTree(indent)
 
+    @addToClass(AST.FlowKeyword)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + self.keyword)
+
     @addToClass(AST.For)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + 'FOR')
