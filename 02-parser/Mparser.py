@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import scanner
 import ply.yacc as yacc
+
 
 tokens = scanner.tokens
 literals = scanner.literals
@@ -22,11 +24,11 @@ precedence = (
 
 
 def p_error(p):
-    if p:
+        # using lexer object for convenient global state store
+        p.lexer.encountered_error = True
         print("Syntax error at line {0}, column {1}: LexToken({2}, '{3}')"
               .format(p.lineno, scanner.find_column(p.lexer.lexdata, p),
                       p.type, p.value))
-    else:
         print("Unexpected end of input")
 
 
@@ -49,10 +51,14 @@ def p_instruction(p):
 
 def p_statement(p):
     """statement : assignment
+                 | flow_keyword
                  | return
-                 | print
-                 | BREAK
-                 | CONTINUE"""
+                 | print"""
+
+
+def p_flow_keyword(p):
+    """flow_keyword : BREAK
+                    | CONTINUE"""
 
 
 def p_expression(p):
@@ -70,9 +76,9 @@ def p_print(p):
 
 
 def p_print_body(p):
-    """print_body : STRING
+    """print_body : string
                   | expression
-                  | STRING ',' print_body
+                  | string ',' print_body
                   | expression ',' print_body"""
 
 
@@ -80,9 +86,14 @@ def p_return(p):
     """return : RETURN expression
               | RETURN"""
 
+
+def p_string(p):
+    """string : STRING"""
+
 # -------------------------
 # Matrices
 # -------------------------
+
 
 def p_vector(p):
     """vector : '[' vector_body ']'
@@ -109,7 +120,7 @@ def p_matrix_body(p):
 # -------------------------
 
 def p_array_range(p):
-    """array_range : ID '[' expression ',' expression ']'"""
+    """array_range : var '[' expression ',' expression ']'"""
 
 
 # -------------------------
@@ -158,13 +169,13 @@ def p_conditional(p):
 # -------------------------
 
 def p_assignment_lhs(p):
-    """assignment_lhs : ID
+    """assignment_lhs : var
                       | array_range"""
 
 
 def p_assignment(p):
     """assignment : assignment_lhs assignment_operator expression
-                  | assignment_lhs '=' STRING"""
+                  | assignment_lhs '=' string"""
 
 
 def p_assignment_operator(p):
@@ -214,6 +225,7 @@ def p_numeric_expression(p):
                           | fun
                           | '(' numeric_expression ')'"""
 
+
 def p_bin_numeric_expression(p):
     """numeric_expression : numeric_expression '+' numeric_expression
                           | numeric_expression '-' numeric_expression
@@ -239,5 +251,4 @@ def p_comparison_expression(p):
            | '(' comparison_expression ')'"""
 
 
-# scanner = scanner.lexer
 parser = yacc.yacc()
