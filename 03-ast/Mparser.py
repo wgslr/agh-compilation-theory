@@ -157,8 +157,8 @@ def p_matrix_body(p):
 # -------------------------
 
 def p_array_range(p):
-    """array_range : ID '[' expression ',' expression ']'"""
-    p[0] = AST.Reference(AST.Variable(p[1]), [p[3], p[5]])
+    """array_range : var '[' expression ',' expression ']'"""
+    p[0] = AST.Reference(p[1], [p[3], p[5]])
 
 
 # -------------------------
@@ -248,8 +248,7 @@ def p_var(p):
     if len(p) == 2:
         p[0] = AST.Variable(p[1])
     else:
-        # TODO
-        pass
+        p[0] = AST.Reference(p[1], [p[3]])
 
 
 def p_num(p):

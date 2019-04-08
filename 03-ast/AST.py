@@ -94,11 +94,6 @@ class BinExpr(Node):
         self.left = left
         self.right = right
 
-    # TODO remove - use printTreee
-    def __repr__(self):
-        return "{} {} {}".format(self.left, self.op, self.right)
-
-
 class Assignment(BinExpr):
     pass
 

@@ -105,7 +105,6 @@ class TreePrinter:
     @addToClass(AST.Error)
     def printTree(self, indent=0):
         pass
-        # TODO fill in the body
 
     @addToClass(AST.UnaryExpr)
     def printTree(self, indent=0):
