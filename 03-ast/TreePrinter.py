@@ -12,6 +12,10 @@ def addToClass(cls):
 
 class TreePrinter:
 
+    @classmethod
+    def makeIndent(_self, indent):
+        return ''.join("|  " * indent)
+
     @addToClass(AST.Node)
     def printTree(self, indent=0):
         raise Exception("printTree not defined in class " +
@@ -26,30 +30,6 @@ class TreePrinter:
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + self.keyword)
 
-    @addToClass(AST.For)
-    def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + 'FOR')
-        self.iterator.printTree(indent + 1)
-        self.range.printTree(indent + 1)
-        self.body.printTree(indent + 1)
-
-    @addToClass(AST.While)
-    def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + 'WHILE')
-        self.condition.printTree(indent + 1)
-        self.body.printTree(indent + 1)
-
-    @addToClass(AST.If)
-    def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + 'IF')
-        self.condition.printTree(indent + 1)
-        print(TreePrinter.makeIndent(indent) + 'THEN')
-        self.body.printTree(indent + 1)
-        if self.else_body is not None:
-            print(TreePrinter.makeIndent(indent) + 'ELSE')
-            self.else_body.printTree(indent + 1)
-
-
     @addToClass(AST.Print)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + 'PRINT')
@@ -62,33 +42,15 @@ class TreePrinter:
         if self.value is not None:
             self.value.printTree(indent + 1)
 
-
     @addToClass(AST.String)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + self.value)
-
-
-    @addToClass(AST.Range)
-    def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + 'RANGE')
-        self.start.printTree(indent + 1)
-        self.end.printTree(indent + 1)
-
-    @addToClass(AST.Assignment)
-    def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + self.op)
-        self.left.printTree(indent + 1)
-        self.right.printTree(indent + 1)
 
     @addToClass(AST.Vector)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + "VECTOR")
         for e in self.elements:
             e.printTree(indent + 1)
-
-    @addToClass(AST.Variable)
-    def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + self.name)
 
     @addToClass(AST.Reference)
     def printTree(self, indent=0):
@@ -102,18 +64,38 @@ class TreePrinter:
         print(TreePrinter.makeIndent(indent) + self.name)
         self.argument.printTree(indent + 1)
 
-    @addToClass(AST.IntNum)
+    @addToClass(AST.While)
     def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + str(self.value))
+        print(TreePrinter.makeIndent(indent) + 'WHILE')
+        self.condition.printTree(indent + 1)
+        self.body.printTree(indent + 1)
 
-    @addToClass(AST.Error)
+    @addToClass(AST.For)
     def printTree(self, indent=0):
-        pass
+        print(TreePrinter.makeIndent(indent) + 'FOR')
+        self.iterator.printTree(indent + 1)
+        self.range.printTree(indent + 1)
+        self.body.printTree(indent + 1)
 
-    @addToClass(AST.UnaryExpr)
+    @addToClass(AST.Range)
     def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + self.operation)
-        self.operand.printTree(indent + 1)
+        print(TreePrinter.makeIndent(indent) + 'RANGE')
+        self.start.printTree(indent + 1)
+        self.end.printTree(indent + 1)
+
+    @addToClass(AST.Variable)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + self.name)
+
+    @addToClass(AST.If)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + 'IF')
+        self.condition.printTree(indent + 1)
+        print(TreePrinter.makeIndent(indent) + 'THEN')
+        self.body.printTree(indent + 1)
+        if self.else_body is not None:
+            print(TreePrinter.makeIndent(indent) + 'ELSE')
+            self.else_body.printTree(indent + 1)
 
     @addToClass(AST.BinExpr)
     def printTree(self, indent=0):
@@ -125,6 +107,25 @@ class TreePrinter:
     def printTree(self, indent=0):
         AST.BinExpr.printTree(self, indent)
 
-    @classmethod
-    def makeIndent(_self, indent):
-        return ''.join("|  " * indent)
+    @addToClass(AST.Assignment)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + self.op)
+        self.left.printTree(indent + 1)
+        self.right.printTree(indent + 1)
+
+    @addToClass(AST.IntNum)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + str(self.value))
+
+    @addToClass(AST.FloatNum)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + str(self.value))
+
+    @addToClass(AST.UnaryExpr)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + self.operation)
+        self.operand.printTree(indent + 1)
+
+    @addToClass(AST.Error)
+    def printTree(self, indent=0):
+        pass

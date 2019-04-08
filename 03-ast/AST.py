@@ -88,6 +88,9 @@ class BinExpr(Node):
         self.right = right
 
 
+class ArithmeticOperation(BinExpr):
+    pass
+
 class Assignment(BinExpr):
     pass
 
@@ -107,9 +110,6 @@ class UnaryExpr(Node):
         self.operation = operation
         self.operand = operand
 
-
-class ArithmeticOperation(BinExpr):
-    pass
 
 
 class Comparison(BinExpr):
