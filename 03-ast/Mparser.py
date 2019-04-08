@@ -26,6 +26,7 @@ precedence = (
 
 def p_error(p):
     if p:
+        p.lexer.encountered_error = True
         print("Syntax error at line {0}, column {1}: LexToken({2}, '{3}')"
               .format(p.lineno, scanner.find_column(p.lexer.lexdata, p),
                       p.type, p.value))
@@ -325,6 +326,4 @@ def p_comparison_expression(p):
         p[0] = AST.Comparison(p[2], p[1], p[3])
 
 
-# TODO Fix "Lexer instance has no attribute 'find_column'"
-scanner = scanner.lexer
 parser = yacc.yacc()
