@@ -26,61 +26,14 @@ class Return(Node):
         self.value = value
 
 
-class For(Node):
-    def __init__(self, iterator, start, end, body):
-        self.iterator = iterator
-        self.range = Range(start, end)
-        self.body = body
-
-
-class While(Node):
-    def __init__(self, condition, body):
-        self.condition = condition
-        self.body = body
-
-
-class If(Node):
-    def __init__(self, condition, body, else_body=None):
-        self.condition = condition
-        self.body = body
-        self.else_body = else_body
-
-
-class Range(Node):
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
-
-
-class FunctionCall(Node):
-    def __init__(self, func_name, argument):
-        self.name = func_name
-        self.argument = argument
-
-
-class Vector(Node):
-    def __init__(self, elements):
-        self.elements = elements
-
-
-class IntNum(Node):
-    def __init__(self, value):
-        self.value = value
-
-
 class String(Node):
     def __init__(self, value):
         self.value = value
 
 
-class FloatNum(Node):
-    def __init__(self, value):
-        self.value = value
-
-
-class Variable(Node):
-    def __init__(self, name):
-        self.name = name
+class Vector(Node):
+    def __init__(self, elements):
+        self.elements = elements
 
 
 class Reference(Node):
@@ -91,10 +44,41 @@ class Reference(Node):
         self.coords = coords
 
 
-class UnaryExpr(Node):
-    def __init__(self, operation, operand):
-        self.operation = operation
-        self.operand = operand
+class FunctionCall(Node):
+    def __init__(self, func_name, argument):
+        self.name = func_name
+        self.argument = argument
+
+
+class While(Node):
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+
+
+class For(Node):
+    def __init__(self, iterator, start, end, body):
+        self.iterator = iterator
+        self.range = Range(start, end)
+        self.body = body
+
+
+class Range(Node):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+
+class Variable(Node):
+    def __init__(self, name):
+        self.name = name
+
+
+class If(Node):
+    def __init__(self, condition, body, else_body=None):
+        self.condition = condition
+        self.body = body
+        self.else_body = else_body
 
 
 class BinExpr(Node):
@@ -108,17 +92,28 @@ class Assignment(BinExpr):
     pass
 
 
-class Comparison(BinExpr):
-    pass
+class IntNum(Node):
+    def __init__(self, value):
+        self.value = value
+
+
+class FloatNum(Node):
+    def __init__(self, value):
+        self.value = value
+
+
+class UnaryExpr(Node):
+    def __init__(self, operation, operand):
+        self.operation = operation
+        self.operand = operand
 
 
 class ArithmeticOperation(BinExpr):
     pass
 
 
-class Variable(Node):
-    def __init__(self, name):
-        self.name = name
+class Comparison(BinExpr):
+    pass
 
 
 class Error(Node):

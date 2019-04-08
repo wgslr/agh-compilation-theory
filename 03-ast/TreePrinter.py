@@ -49,6 +49,7 @@ class TreePrinter:
             print(TreePrinter.makeIndent(indent) + 'ELSE')
             self.else_body.printTree(indent + 1)
 
+
     @addToClass(AST.Print)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + 'PRINT')
@@ -61,9 +62,11 @@ class TreePrinter:
         if self.value is not None:
             self.value.printTree(indent + 1)
 
+
     @addToClass(AST.String)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + self.value)
+
 
     @addToClass(AST.Range)
     def printTree(self, indent=0):
