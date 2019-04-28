@@ -290,6 +290,7 @@ def p_transposition(p):
 def p_numeric_expression(p):
     """numeric_expression : num
                           | matrix
+                          | vector
                           | unary_op
                           | fun
                           | '(' numeric_expression ')'"""
