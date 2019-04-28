@@ -36,6 +36,10 @@ class Vector(Node):
         self.elements = elements
 
 
+class Matrix(Vector):
+    pass
+
+
 class Reference(Node):
     """A matrix cell reference"""
 

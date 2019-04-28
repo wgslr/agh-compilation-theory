@@ -142,9 +142,9 @@ def p_matrix(p):
     """matrix : '[' matrix_body ']'
               | '[' ']'"""
     if len(p) == 3:
-        p[0] = AST.Vector([])
+        p[0] = AST.Matrix([])
     else:
-        p[0] = AST.Vector(p[2])
+        p[0] = AST.Matrix(p[2])
 
 
 def p_matrix_body(p):

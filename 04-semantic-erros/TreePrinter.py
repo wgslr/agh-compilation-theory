@@ -52,6 +52,12 @@ class TreePrinter:
         for e in self.elements:
             e.printTree(indent + 1)
 
+    @addToClass(AST.Matrix)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + "MATRIX")
+        for e in self.elements:
+            e.printTree(indent + 1)
+
     @addToClass(AST.Reference)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + "REF")
