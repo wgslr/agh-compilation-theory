@@ -91,6 +91,7 @@ class BinExpr(Node):
 class ArithmeticOperation(BinExpr):
     pass
 
+
 class Assignment(BinExpr):
     pass
 
@@ -109,7 +110,6 @@ class UnaryExpr(Node):
     def __init__(self, operation, operand):
         self.operation = operation
         self.operand = operand
-
 
 
 class Comparison(BinExpr):
