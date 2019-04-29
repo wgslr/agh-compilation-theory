@@ -173,7 +173,10 @@ def p_array_range(p):
 def p_fun(p):
     """fun : fun_name '(' numeric_expression ')'
            | fun_name '(' error ')'"""
-    p[0] = AST.FunctionCall(p[1], p[3])
+    if len(p) == 5:
+        p[0] = AST.FunctionCall(p[1], [p[3]])
+    else:
+        p[0] = AST.FunctionCall(p[1], [p[3], p[4]])
 
 
 def p_fun_name(p):

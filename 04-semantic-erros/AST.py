@@ -49,9 +49,9 @@ class Reference(Node):
 
 
 class FunctionCall(Node):
-    def __init__(self, func_name, argument):
+    def __init__(self, func_name, arguments):
         self.name = func_name
-        self.argument = argument
+        self.arguments = arguments
 
 
 class While(Node):
