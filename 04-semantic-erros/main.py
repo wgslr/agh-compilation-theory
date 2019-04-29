@@ -21,6 +21,6 @@ if __name__ == '__main__':
     lexer.encountered_error = False
     ast = parser.parse(text, lexer=lexer, tracking=True)
     if not lexer.encountered_error and ast is not None:
-        # ast.printTree()
+        ast.printTree()
         typeChecker = TypeChecker()
         typeChecker.visit(ast)
