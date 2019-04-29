@@ -5,34 +5,40 @@ class Node(object):
 
 
 class Instructions(Node):
-    def __init__(self, nodes):
+    def __init__(self, lineno, nodes):
+        self.lineno = lineno
         self.nodes = nodes
 
 
 class FlowKeyword(Node):
-    def __init__(self, keyword):
+    def __init__(self, lineno, keyword):
+        self.lineno = lineno
         self.keyword = keyword.upper()
 
 
 class Print(Node):
-    def __init__(self, arguments):
+    def __init__(self, lineno, arguments):
+        self.lineno = lineno
         self.arguments = arguments
 
 
 class Return(Node):
-    def __init__(self, value=None):
+    def __init__(self, lineno, value=None):
+        self.lineno = lineno
         """argument may be None for return statement
         without a return value"""
         self.value = value
 
 
 class String(Node):
-    def __init__(self, value):
+    def __init__(self, lineno, value):
+        self.lineno = lineno
         self.value = value
 
 
 class Vector(Node):
-    def __init__(self, elements):
+    def __init__(self, lineno, elements):
+        self.lineno = lineno
         self.elements = elements
 
 
@@ -43,50 +49,58 @@ class Matrix(Vector):
 class Reference(Node):
     """A matrix cell reference"""
 
-    def __init__(self, name, coords):
+    def __init__(self, lineno, name, coords):
+        self.lineno = lineno
         self.name = name
         self.coords = coords
 
 
 class FunctionCall(Node):
-    def __init__(self, func_name, arguments):
+    def __init__(self, lineno, func_name, arguments):
+        self.lineno = lineno
         self.name = func_name
         self.arguments = arguments
 
 
 class While(Node):
-    def __init__(self, condition, body):
+    def __init__(self, lineno, condition, body):
+        self.lineno = lineno
         self.condition = condition
         self.body = body
 
 
 class For(Node):
-    def __init__(self, iterator, start, end, body):
+    def __init__(self, lineno, iterator, start, end, body):
+        self.lineno = lineno
         self.iterator = iterator
-        self.range = Range(start, end)
+        self.range = Range(lineno, start, end)
         self.body = body
 
 
 class Range(Node):
-    def __init__(self, start, end):
+    def __init__(self, lineno, start, end):
+        self.lineno = lineno
         self.start = start
         self.end = end
 
 
 class Variable(Node):
-    def __init__(self, name):
+    def __init__(self, lineno, name):
+        self.lineno = lineno
         self.name = name
 
 
 class If(Node):
-    def __init__(self, condition, body, else_body=None):
+    def __init__(self, lineno, condition, body, else_body=None):
+        self.lineno = lineno
         self.condition = condition
         self.body = body
         self.else_body = else_body
 
 
 class BinExpr(Node):
-    def __init__(self, op, left, right):
+    def __init__(self, lineno, op, left, right):
+        self.lineno = lineno
         self.op = op
         self.left = left
         self.right = right
@@ -101,17 +115,20 @@ class Assignment(BinExpr):
 
 
 class IntNum(Node):
-    def __init__(self, value):
+    def __init__(self, lineno, value):
+        self.lineno = lineno
         self.value = value
 
 
 class FloatNum(Node):
-    def __init__(self, value):
+    def __init__(self, lineno, value):
+        self.lineno = lineno
         self.value = value
 
 
 class UnaryExpr(Node):
-    def __init__(self, operation, operand):
+    def __init__(self, lineno, operation, operand):
+        self.lineno = lineno
         self.operation = operation
         self.operand = operand
 

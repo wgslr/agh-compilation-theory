@@ -85,25 +85,25 @@ class NodeVisitor(object):
 class TypeChecker(NodeVisitor):
 
     def visit_Instructions(self, node):
-        # print("Visit Instructions")
+        # print("visit_Instructions")
         for n in node.nodes:
             self.visit(n)
 
     def visit_FlowKeyword(self, node):
-        # print("Visit Flowkeyword")
+        # print("visit_Flowkeyword")
         if self.loop == 0:
             TypeChecker.print_error(node, "flow keyword {} outside loop".format(node.keyword))
 
     def visit_Print(self, node):
-        # print("Visit Print")
+        # print("visit_Print")
         pass
 
     def visit_Return(self, node):
-        # print("Visit Return")
+        # print("visit_Return")
         pass
 
     def visit_String(self, node):
-        # print("Visit String")
+        # print("visit_String")
         pass
 
     def visit_Matrix(self, node):
@@ -113,15 +113,15 @@ class TypeChecker(NodeVisitor):
         if all(map(lambda x: x == size2, sizes)):
             return self.Variable("matrix", [size1, size2])
         else:
-            TypeChecker.print_error(node, "vectors with different sizes int matrix initialization")
+            TypeChecker.print_error(node, "vectors with different sizes in matrix initialization")
             return None
 
     def visit_Vector(self, node):
-        # print("Visit Vector")
+        # print("visit_Vector")
         return self.Variable("vector", [len(node.elements)])
 
     def visit_Reference(self, node):
-        # print("Visit Reference")
+        # print("visit_Reference")
         v = self.variables[node.name.name]
         if not v:
             TypeChecker.print_error(node, "undefined variable {}".format(node.name.name))
@@ -142,35 +142,35 @@ class TypeChecker(NodeVisitor):
             return TypeChecker.Variable("vector", [v.size[-1]])
 
     def visit_FunctionCall(self, node):
-        # print("Visit FunctionCall")
-        return TypeChecker.Variable("matrix", node.arguments)
+        # print("visit_FunctionCall")
+        return TypeChecker.Variable("matrix", map(lambda x: x.value, node.arguments))
 
     def visit_While(self, node):
-        # print("Visit While")
+        # print("visit_While")
         self.loop += 1
         self.visit(node.body)
         self.loop -= 1
 
     def visit_For(self, node):
-        # print("Visit For")
+        # print("visit_For")
         self.loop += 1
         self.visit(node.body)
         self.loop -= 1
 
     def visit_Range(self, node):
-        # print("Visit Range")
+        # print("visit_Range")
         pass
 
     def visit_Variable(self, node):
-        # print("Visit Variable")
+        # print("visit_Variable")
         return self.variables[node.name]
 
     def visit_If(self, node):
-        # print("Visit if")
+        # print("visit_if")
         pass
 
     def visit_BinExpr(self, node):
-        # print("Visit BinExpr")
+        # print("visit_BinExpr")
 
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
@@ -191,7 +191,7 @@ class TypeChecker(NodeVisitor):
             return None
 
     def visit_ArithmeticOperation(self, node):
-        # print("Visit ArithmeticOperation")
+        # print("visit_ArithmeticOperation")
         return self.visit_BinExpr(node)
 
     def visit_Assignment(self, node):
@@ -236,7 +236,7 @@ class TypeChecker(NodeVisitor):
 
     @staticmethod
     def print_error(node, error):
-        print("Error: {}".format(error))
+        print("Error in line {}: {}".format(node.lineno, error))
 
     class Variable(object):
         def __init__(self, type, size=[], name=""):
