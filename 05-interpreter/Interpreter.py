@@ -21,9 +21,11 @@ sys.setrecursionlimit(10000)
 # in rhs context
 
 class Interpreter(object):
+    memories = MemoryStack()
 
-    def __init__(self):
-        self.memories = MemoryStack()
+    # indicates that next variable reference should not be resolved
+    # to its value
+    lvalue = False
 
     @on('node')
     def visit(self, node):
@@ -61,7 +63,9 @@ class Interpreter(object):
         print("inteprete assignemnt: {} {} {}".format(node.left, node.op, node.right))
         # TODO make it work for matrices on lhs
 
-        var = node.left
+        self.lvalue = True
+        var = node.left.accept(self)
+        self.lvalue = False
 
         if node.op == "=":
             value = node.right.accept(self)
@@ -79,18 +83,20 @@ class Interpreter(object):
 
     @when(AST.Variable)
     def visit(self, node):
+        if self.lvalue:
+            return node
         return self.memories.get(node)
 
     @when(AST.Reference)
     def visit(self, node):
-        # vector = self.memories.get(node)
-        # for coord in node.coords[:-1]:
-        #     vector = vector[coord.accept(self)]
-        # return IndexReference(vector, node.coords[-1].accept(self))
-        print(self.memories)
-        print(node)
-        print("got {} ".format(self.memories.get(node)))
-        return self.memories.get(node)
+        lvalue = self.lvalue
+        self.lvalue = False
+        node.coords = [c.accept(self) for c in node.coords]
+
+        if lvalue:
+            return node
+        else:
+            return self.memories.get(node)
 
     @when(AST.IntNum)
     def visit(self, node):

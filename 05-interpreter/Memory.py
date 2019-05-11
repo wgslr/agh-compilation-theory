@@ -29,8 +29,8 @@ class Memory:
             print("getting reference")
             value = self.get(node.name)
             for coord in node.coords:
-                print("value = {}[{}]".format(value, coord.value))
-                value = value[coord.value]
+                print("value = {}[{}]".format(value, coord))
+                value = value[coord]
                 if value is None:
                     break
             return value
@@ -45,8 +45,8 @@ class Memory:
             print("setting reference")
             container = self.variables[node.name.name]
             for coord in node.coords[:-1]:
-                container = container[coord.value]
-            container[node.coords[-1].value] = value
+                container = container[coord]
+            container[node.coords[-1]] = value
         else:
             raise TypeError("{} is not a memory reference".format(node.__class__))
         print("{} becomes {}".format(node.name, value))
