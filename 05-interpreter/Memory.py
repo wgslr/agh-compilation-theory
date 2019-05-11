@@ -42,11 +42,22 @@ class MemoryStack:
         return None
 
     def insert(self, name, value):  # inserts into memory stack variable <name> with value <value>
+        """
+        Sets variable <name> to value <value> in the current scope
+        """
         self.stack[-1].put(name, value)
 
-    def set(self, name, value):  # sets variable <name> to value <value>
-        # TODO what's the difference from insert?
-        self.stack[-1].put(name, value)
+    def set(self, name, value):
+        """
+        Sets variable <name> to value <value> in the scope where
+        it was declared. Creates new local variable if undefined.
+        """
+        for m in stack[::-1]:
+            if m.has_key(name):
+                m.put(name, value)
+                break
+        else:
+            self.insert(name, value)
 
     def push(self, memory):  # pushes memory <memory> onto the stack
         self.stack.append(memory)
