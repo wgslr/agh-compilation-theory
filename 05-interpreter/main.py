@@ -1,7 +1,8 @@
+#!/bin/env python2
 
 import sys
 import ply.yacc as yacc
-from Mparser import Mparser
+import Mparser
 from TreePrinter import TreePrinter
 from TypeChecker import TypeChecker
 from Interpreter import Interpreter
@@ -16,17 +17,19 @@ if __name__ == '__main__':
         print("Cannot open {0} file".format(filename))
         sys.exit(0)
 
-    Mparser = Mparser()
-    parser = yacc.yacc(module=Mparser)
+
+    parser = Mparser.parser
     text = file.read()
+    lexer = Mparser.scanner.lexer
+    lexer.encountered_error = False
+    ast = parser.parse(text, lexer=lexer, tracking=True)
+    if not lexer.encountered_error and ast is not None:
+        ast.printTree()
+        typeChecker = TypeChecker()
+        typeChecker.visit(ast)
 
-    ast = parser.parse(text, lexer=Mparser.scanner)
+        # ast.accept(Interpreter())
 
-    # Below code shows how to use visitor
-    typeChecker = TypeChecker()   
-    typeChecker.visit(ast)   # or alternatively ast.accept(typeChecker)
-
-    ast.accept(Interpreter())
     # in future
     # ast.accept(OptimizationPass1())
     # ast.accept(OptimizationPass2())

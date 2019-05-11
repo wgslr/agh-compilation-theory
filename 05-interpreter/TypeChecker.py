@@ -142,11 +142,11 @@ class TypeChecker(NodeVisitor):
             return TypeChecker.Variable("vector", [v.size[-1]])
 
     def visit_FunctionCall(self, node):
-        # print("visit_FunctionCall")
+        print("visit_FunctionCall")
         arguments = node.arguments
         if len(arguments) == 1:
             arguments = [arguments[0], arguments[0]]
-        return TypeChecker.Variable("matrix", map(lambda x: x.value, arguments))
+        return TypeChecker.Variable("matrix", [x.value for x in arguments])
 
     def visit_While(self, node):
         # print("visit_While")
