@@ -38,12 +38,6 @@ class Return(Node):
         self.value = value
 
 
-class String(Node):
-    def __init__(self, lineno, value):
-        self.lineno = lineno
-        self.value = value
-
-
 class Vector(Node):
     def __init__(self, lineno, elements):
         self.lineno = lineno
@@ -122,16 +116,22 @@ class Assignment(BinExpr):
     pass
 
 
-class IntNum(Node):
+class Literal(Node):
     def __init__(self, lineno, value):
         self.lineno = lineno
+        print("self.value = {}".format(value))
         self.value = value
 
+class String(Literal):
+    pass
 
-class FloatNum(Node):
-    def __init__(self, lineno, value):
-        self.lineno = lineno
-        self.value = value
+
+class IntNum(Literal):
+    pass
+
+
+class FloatNum(Literal):
+    pass
 
 
 class UnaryExpr(Node):

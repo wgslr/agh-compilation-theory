@@ -25,8 +25,11 @@ class Interpreter(object):
 
     @on('node')
     def visit(self, node):
-        print("interpret DEFAULT")
         pass
+
+    @when(AST.Block)
+    def visit(self, node):
+        return node.content.accept(self)
 
     @when(AST.Block)
     def visit(self, node):
@@ -38,12 +41,15 @@ class Interpreter(object):
         for n in node.nodes:
             n.accept(self)
 
-    @when(AST.BinExpr)
+    @when(AST.ArithmeticOperation)
     def visit(self, node):
         print("interpret AST.BinExpr")
+        print("left {} right {}".format(node.left, node.right))
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
         op_fun = binop_to_operator[node.op]
+        print ("{}({}, {}) = {}".format(op_fun, r1, r2, op_fun(r1,r2)))
+        print(r1, r2)
         return op_fun(r1, r2)
 
     @when(AST.Assignment)
@@ -56,9 +62,22 @@ class Interpreter(object):
         self.memories.insert(var.name, value)
         print(self.memories)
 
+
     @when(AST.IntNum)
     def visit(self, node):
+        print("interpret AST.IntNum: {}".format(node.value))
         return node.value
+
+    @when(AST.FloatNum)
+    def visit(self, node):
+        print("interpret AST.FloatNum: {}".format(node.value))
+        return node.value
+
+    @when(AST.String)
+    def visit(self, node):
+        print("interpret AST.String: {}".format(node.value))
+        return node.value
+
 
     # simplistic while loop interpretation
     @when(AST.While)
