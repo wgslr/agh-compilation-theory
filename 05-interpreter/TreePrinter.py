@@ -21,6 +21,11 @@ class TreePrinter:
         raise Exception("printTree not defined in class " +
                         self.__class__.__name__)
 
+    @addToClass(AST.Block)
+    def printTree(self, indent=0):
+        print(TreePrinter.makeIndent(indent) + 'BLOCK')
+        self.content.printTree(indent + 1)
+
     @addToClass(AST.Instructions)
     def printTree(self, indent=0):
         for n in self.nodes:

@@ -81,7 +81,7 @@ def p_expression(p):
 def p_block(p):
     """block : '{' instructions '}'
              | '{' error '}'"""
-    p[0] = p[2]
+    p[0] = AST.Block(p.lineno(1), p[2])
 
 
 def p_print(p):

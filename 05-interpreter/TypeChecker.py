@@ -84,6 +84,10 @@ class NodeVisitor(object):
 
 class TypeChecker(NodeVisitor):
 
+    def visit_Block(self, node):
+        # print("visit_Instructions")
+        self.visit(node.content)
+
     def visit_Instructions(self, node):
         # print("visit_Instructions")
         for n in node.nodes:

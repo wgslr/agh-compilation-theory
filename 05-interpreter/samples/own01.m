@@ -5,4 +5,11 @@ for i = 1:N {
     }
     break;
 }
-continue;
+
+
+for a = 3:5
+    b = a;
+
+{
+    e = "naked block";
+}

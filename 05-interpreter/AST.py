@@ -10,6 +10,12 @@ class Instructions(Node):
         self.nodes = nodes
 
 
+class Block(Node):
+    def __init__(self, lineno, content):
+        self.lineno = lineno
+        self.content = content
+
+
 class FlowKeyword(Node):
     def __init__(self, lineno, keyword):
         self.lineno = lineno
