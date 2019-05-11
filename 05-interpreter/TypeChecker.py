@@ -76,7 +76,7 @@ op_to_string = {
 
 class NodeVisitor(object):
     loop = 0
-    variables = defaultdict(lambda: None)
+    symbols = SymbolTable()
 
     def visit(self, node):
         method = 'visit_' + node.__class__.__name__
@@ -88,7 +88,9 @@ class TypeChecker(NodeVisitor):
 
     def visit_Block(self, node):
         # print("visit_Instructions")
+        self.symbols = self.symbols.createChild()
         self.visit(node.content)
+        self.symbols = self.symbols.getParentScope()
 
     def visit_Instructions(self, node):
         # print("visit_Instructions")
@@ -127,7 +129,7 @@ class TypeChecker(NodeVisitor):
 
     def visit_Reference(self, node):
         # print("visit_Reference")
-        v = self.variables[node.name.name]
+        v = self.symbols.get(node.name.name)
         if not v:
             TypeChecker.print_error(node, "undefined variable {}".format(node.name.name))
             return None
@@ -142,16 +144,16 @@ class TypeChecker(NodeVisitor):
         if error:
             return None
         if len(v.size) - len(node.coords) == 0:
-            return TypeChecker.Variable("float")
+            return Variable("float")
         else:
-            return TypeChecker.Variable("vector", [v.size[-1]])
+            return Variable("vector", [v.size[-1]])
 
     def visit_FunctionCall(self, node):
         print("visit_FunctionCall")
         arguments = node.arguments
         if len(arguments) == 1:
             arguments = [arguments[0], arguments[0]]
-        return TypeChecker.Variable("matrix", [x.value for x in arguments])
+        return Variable("matrix", [x.value for x in arguments])
 
     def visit_While(self, node):
         # print("visit_While")
@@ -171,7 +173,7 @@ class TypeChecker(NodeVisitor):
 
     def visit_Variable(self, node):
         # print("visit_Variable")
-        return self.variables[node.name]
+        return self.symbols.get(node.name)
 
     def visit_If(self, node):
         # print("visit_if")
@@ -211,14 +213,16 @@ class TypeChecker(NodeVisitor):
         name = node.left.name
         op = node.op
         if op == "=":
-            self.variables[name] = Variable(var2.type, var2.size, name)
+            symbol = Variable(var2.type, var2.size, name)
+            self.symbols.put(name, symbol)
         else:
             if not var1:
                 TypeChecker.print_error(node, "undefined variable {}".format(name))
                 return None
             newtype = allowed_operations[op[0]][var1.type][var2.type]
             if newtype:
-                self.variables[name] = Variable(newtype, var2.size, name)
+                symbol = Variable(newtype, var2.size, name)
+                self.symbols.put(name, symbol)
             else:
                 TypeChecker.print_error(node, "cannot assign {} to {}".format(var2.type, var1.type))
 

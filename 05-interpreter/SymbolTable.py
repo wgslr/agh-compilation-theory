@@ -16,20 +16,27 @@ class Variable(object):
 
 class SymbolTable(object):
 
-    def __init__(self, parent, name): # parent scope and symbol table name
+    def __init__(self, parent = None): # parent scope and symbol table name
+        self.parent = parent
+        self.symbols = dict()
         pass
 
     def put(self, name, symbol): # put variable symbol or fundef under <name> entry
-        pass
+        self.symbols[name] = symbol
 
-    def get(self, name): # get variable symbol or fundef from <name> entry
-        pass
+    def get(self, name):
+        """Returns symbol of given name, or None if the symbol is not known"""
+        local = self.symbols.get(name)
+        if local is None and self.hasParent():
+            return self.parent.get(name)
+        return local
 
     def getParentScope(self):
-        pass
+        return self.parent
 
-    def pushScope(self, name):
-        pass
+    def hasParent(self):
+        return self.parent is not None
 
-    def popScope(self):
-        pass
+    def createChild(self):
+        return SymbolTable(self)
+
