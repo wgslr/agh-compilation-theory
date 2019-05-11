@@ -33,22 +33,27 @@ def when(param_type):
 
 class Dispatcher(object):
   def __init__(self, param_name, fn):
-    frame = inspect.currentframe().f_back.f_back   # these 2 lines
-    top_level = frame.f_locals == frame.f_globals  # seem redundant
     self.param_index = inspect.getargspec(fn).args.index(param_name)
     self.param_name = param_name
     self.targets = {}
 
   def __call__(self, *args, **kw):
+    """
+    If there is a visit function defined explicitely
+    for the class of `typ`, result of the `visit` function is returned.
+    If the visit function is defined for superclasse(s)
+    of `typ`, a list of `visit` results for all `typ`
+    superclasses is returned.
+    """
+
     typ = args[self.param_index].__class__
     d = self.targets.get(typ)
     if d is not None:
       return d(*args, **kw)
     else:
-      issub = issubclass
-      t = self.targets
-      ks = t.iterkeys()
-      return [ t[k](*args, **kw) for k in ks if issub(typ, k) ]
+      class_to_visitorfun = self.targets
+      classes = class_to_visitorfun.iterkeys()
+      return [ class_to_visitorfun[c](*args, **kw) for c in classes if issubclass(typ, c) ]
 
   def add_target(self, typ, target):
     self.targets[typ] = target
