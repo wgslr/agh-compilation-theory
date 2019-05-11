@@ -1,8 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 
 from collections import defaultdict
 from copy import copy
 import AST
+from SymbolTable import Variable, SymbolTable
 
 allowed_operations = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: "")))
 
@@ -108,21 +109,21 @@ class TypeChecker(NodeVisitor):
         pass
 
     def visit_String(self, node):
-        return self.Variable("string")
+        return Variable("string")
 
     def visit_Matrix(self, node):
         size1 = len(node.elements)
         sizes = map(lambda x: len(x.elements), node.elements)
         size2 = min(sizes)
         if all(map(lambda x: x == size2, sizes)):
-            return self.Variable("matrix", [size1, size2])
+            return Variable("matrix", [size1, size2])
         else:
             TypeChecker.print_error(node, "vectors with different sizes in matrix initialization")
             return None
 
     def visit_Vector(self, node):
         # print("visit_Vector")
-        return self.Variable("vector", [len(node.elements)])
+        return Variable("vector", [len(node.elements)])
 
     def visit_Reference(self, node):
         # print("visit_Reference")
@@ -210,24 +211,24 @@ class TypeChecker(NodeVisitor):
         name = node.left.name
         op = node.op
         if op == "=":
-            self.variables[name] = self.Variable(var2.type, var2.size, name)
+            self.variables[name] = Variable(var2.type, var2.size, name)
         else:
             if not var1:
                 TypeChecker.print_error(node, "undefined variable {}".format(name))
                 return None
             newtype = allowed_operations[op[0]][var1.type][var2.type]
             if newtype:
-                self.variables[name] = self.Variable(newtype, var2.size, name)
+                self.variables[name] = Variable(newtype, var2.size, name)
             else:
                 TypeChecker.print_error(node, "cannot assign {} to {}".format(var2.type, var1.type))
 
     def visit_IntNum(self, node):
         # print("visit_IntNum")
-        return self.Variable("int")
+        return Variable("int")
 
     def visit_FloatNum(self, node):
         # print("visit_FloatNum")
-        return self.Variable("float")
+        return Variable("float")
 
     def visit_UnaryExpr(self, node):
         # print("visit_UnaryExpr")
@@ -245,14 +246,3 @@ class TypeChecker(NodeVisitor):
     def print_error(node, error):
         print("Error in line {}: {}".format(node.lineno, error))
 
-    class Variable(object):
-        def __init__(self, type, size=[], name=""):
-            self.type = type
-            self.size = size
-            self.name = name
-
-        def __str__(self):
-            return '(Variable {}: {}, {})'.format(self.name, self.type, self.size)
-
-        def __repr__(self):
-            return str(self)

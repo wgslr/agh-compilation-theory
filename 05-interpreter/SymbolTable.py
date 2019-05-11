@@ -1,10 +1,17 @@
 #!/usr/bin/env python2
 
 
-class VariableSymbol(object):
+class Variable(object):
+    def __init__(self, type, size=[], name=""):
+        self.type = type
+        self.size = size
+        self.name = name
 
-    def __init__(self, name, type):
-        pass
+    def __str__(self):
+        return '(Variable {}: {}, {})'.format(self.name, self.type, self.size)
+
+    def __repr__(self):
+        return str(self)
 
 
 class SymbolTable(object):
