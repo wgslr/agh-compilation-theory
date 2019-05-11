@@ -40,3 +40,6 @@ class SymbolTable(object):
     def createChild(self):
         return SymbolTable(self)
 
+
+    # def popScope(self):
+    #     return self.parent

@@ -17,7 +17,6 @@ if __name__ == '__main__':
         print("Cannot open {0} file".format(filename))
         sys.exit(0)
 
-
     parser = Mparser.parser
     text = file.read()
     lexer = Mparser.scanner.lexer
@@ -28,7 +27,7 @@ if __name__ == '__main__':
         typeChecker = TypeChecker()
         typeChecker.visit(ast)
 
-        # ast.accept(Interpreter())
+        ast.accept(Interpreter())
 
     # in future
     # ast.accept(OptimizationPass1())

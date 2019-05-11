@@ -1,7 +1,9 @@
 
 
 class Node(object):
-    pass
+    def accept(self, visitor):
+        print("{} accepts {}".format(self.__class__, visitor.__class__))
+        return visitor.visit(self)
 
 
 class Instructions(Node):
