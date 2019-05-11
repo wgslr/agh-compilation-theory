@@ -252,4 +252,7 @@ class TypeChecker(NodeVisitor):
             self.name = name
 
         def __str__(self):
-            return 'Variable {}: {}, {}'.format(self.name, self.type, self.size)
+            return '(Variable {}: {}, {})'.format(self.name, self.type, self.size)
+
+        def __repr__(self):
+            return str(self)
