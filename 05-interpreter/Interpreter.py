@@ -66,12 +66,12 @@ class Interpreter(object):
         if node.op == "=":
             value = node.right.accept(self)
             # TODO danger - 'name' can be Reference.name
-            self.memories.insert(var.name, value)
+            self.memories.insert(var, value)
         else:
             rhs = node.right.accept(self)
             op_fun = binop_to_operator[node.op[0]]
             value = op_fun(var.accept(self), rhs) 
-            self.memories.insert(var.name, value)
+            self.memories.insert(var, value)
 
     @when(AST.Print)
     def visit(self, node):
@@ -79,14 +79,18 @@ class Interpreter(object):
 
     @when(AST.Variable)
     def visit(self, node):
-        return self.memories.get(node.name)
+        return self.memories.get(node)
 
     @when(AST.Reference)
     def visit(self, node):
-        vector = self.memories.get(node.name.name)
-        for coord in node.coords[:-1]:
-            vector = vector[coord.accept(self)]
-        return IndexReference(vector, node.coords[-1].accept(self))
+        # vector = self.memories.get(node)
+        # for coord in node.coords[:-1]:
+        #     vector = vector[coord.accept(self)]
+        # return IndexReference(vector, node.coords[-1].accept(self))
+        print(self.memories)
+        print(node)
+        print("got {} ".format(self.memories.get(node)))
+        return self.memories.get(node)
 
     @when(AST.IntNum)
     def visit(self, node):
@@ -115,7 +119,3 @@ class Interpreter(object):
         while node.cond.accept(self):
             r = node.body.accept(self)
         return r
-
-    @when(IndexReference)
-    def visit(self, node):
-        return node.get()

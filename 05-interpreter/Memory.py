@@ -1,4 +1,5 @@
 
+import AST
 
 class Memory:
 
@@ -11,15 +12,44 @@ class Memory:
     def __repr__(self):
         return str(self)
 
-    def has_key(self, name):  # variable name
-        return name in self.variables
+    def has_key(self, node):  # variable name
+        if isinstance(node, AST.Variable):
+            return self.variables.get(node.name)
+        elif isinstance(node, AST.Reference):
+            return self.variables.get(node.name.name)
+        else:
+            raise TypeError("{} is not a memory reference".format(node.__class__))
 
-    def get(self, name):         # gets from memory current value of variable <name>
-        return self.variables.get(name)
+    def get(self, node):         # gets from memory current value of variable <name>
 
-    def put(self, name, value):  # puts into memory current value of variable <name>
-        print("{} becomes {}".format(name, value))
-        self.variables[name] = value
+        if isinstance(node, AST.Variable):
+            print("getting variable")
+            return self.variables.get(node.name)
+        elif isinstance(node, AST.Reference):
+            print("getting reference")
+            value = self.get(node.name)
+            for coord in node.coords:
+                print("value = {}[{}]".format(value, coord.value))
+                value = value[coord.value]
+                if value is None:
+                    break
+            return value
+        else:
+            raise TypeError("{} is not a memory reference".format(node.__class__))
+
+    def put(self, node, value):  # puts into memory current value of variable <name>
+        if isinstance(node, AST.Variable):
+            print("setting variable")
+            self.variables[node.name] = value
+        elif isinstance(node, AST.Reference):
+            print("setting reference")
+            container = self.variables[node.name.name]
+            for coord in node.coords[:-1]:
+                container = container[coord.value]
+            container[node.coords[-1].value] = value
+        else:
+            raise TypeError("{} is not a memory reference".format(node.__class__))
+        print("{} becomes {}".format(node.name, value))
 
 
 class MemoryStack:
@@ -36,29 +66,29 @@ class MemoryStack:
     def __repr__(self):
         return str(self)
 
-    def get(self, name):             # gets from memory stack current value of variable <name>
+    def get(self, node):             # gets from memory stack current value of variable <name>
         for m in self.stack[::-1]:
-            if m.has_key(name):
-                return m.get(name)
+            if m.has_key(node):
+                return m.get(node)
         return None
 
-    def insert(self, name, value):  # inserts into memory stack variable <name> with value <value>
+    def insert(self, node, value):  # inserts into memory stack variable <name> with value <value>
         """
-        Sets variable <name> to value <value> in the current scope
+        Sets variable identified by <node> to value <value> in the current scope
         """
-        self.stack[-1].put(name, value)
+        self.stack[-1].put(node, value)
 
-    def set(self, name, value):
+    def set(self, node, value):
         """
-        Sets variable <name> to value <value> in the scope where
+        Sets variable identified by <node> to value <value> in the scope where
         it was declared. Creates new local variable if undefined.
         """
         for m in stack[::-1]:
-            if m.has_key(name):
-                m.put(name, value)
+            if m.has_key(node):
+                m.put(node, value)
                 break
         else:
-            self.insert(name, value)
+            self.insert(node, value)
 
     def push(self, memory):  # pushes memory <memory> onto the stack
         self.stack.append(memory)
@@ -67,24 +97,24 @@ class MemoryStack:
         return self.stack.pop()
 
 
-def Reference(object):
-    def get(self):
-        raise NotImplementedError()
-    def set(self, value):
-        raise NotImplementedError()
+# class Reference(object):
+#     def get(self):
+#         raise NotImplementedError()
+#     def set(self, value):
+#         raise NotImplementedError()
 
 
 
-class IndexReference(object):
-    def __init__(self, vector, index):
-        self.vector = vector
-        self.index = index
+# class IndexReference(object):
+#     def __init__(self, vector, index):
+#         self.vector = vector
+#         self.index = index
     
-    def get(self):
-        return self.vector[self.index]
+#     def get(self):
+#         return self.vector[self.index]
     
-    def set(self, value):
-        self.vector[self.index] = value
+#     def set(self, value):
+#         self.vector[self.index] = value
 
-    def __str__(self):
-        return str(self.get())
+#     def __str__(self):
+#         return str(self.get())

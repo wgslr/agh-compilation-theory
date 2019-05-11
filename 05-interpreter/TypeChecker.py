@@ -117,7 +117,7 @@ class TypeChecker(NodeVisitor):
         size1 = len(node.elements)
         sizes = map(lambda x: len(x.elements), node.elements)
         size2 = min(sizes)
-        if all(map(lambda x: x == size2, sizes)):
+        if all(x == size2 for x in sizes):
             return Variable("matrix", [size1, size2])
         else:
             TypeChecker.print_error(node, "vectors with different sizes in matrix initialization")

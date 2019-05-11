@@ -56,6 +56,9 @@ class Reference(Node):
         self.name = name
         self.coords = coords
 
+    # def __str__(self):
+    #     return self.name.name + "[" + ", ".join(str(x.value) for x in self.coords) + "]"
+
 
 class FunctionCall(Node):
     def __init__(self, lineno, func_name, arguments):
