@@ -11,6 +11,7 @@ allowed_operations["+"]["float"]["int"] = "float"
 allowed_operations["+"]["int"]["float"] = "float"
 allowed_operations["+"]["vector"]["vector"] = "vector"
 allowed_operations["+"]["matrix"]["matrix"] = "matrix"
+allowed_operations["+"]["string"]["string"] = "string"
 
 allowed_operations["-"]["int"]["int"] = "int"
 allowed_operations["-"]["float"]["int"] = "float"
@@ -107,8 +108,7 @@ class TypeChecker(NodeVisitor):
         pass
 
     def visit_String(self, node):
-        # print("visit_String")
-        pass
+        return self.Variable("string")
 
     def visit_Matrix(self, node):
         size1 = len(node.elements)
