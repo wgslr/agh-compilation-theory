@@ -18,6 +18,7 @@ class Memory:
         return self.variables.get(name)
 
     def put(self, name, value):  # puts into memory current value of variable <name>
+        print("{} becomes {}".format(name, value))
         self.variables[name] = value
 
 
@@ -64,3 +65,26 @@ class MemoryStack:
 
     def pop(self):          # pops the top memory from the stack
         return self.stack.pop()
+
+
+def Reference(object):
+    def get(self):
+        raise NotImplementedError()
+    def set(self, value):
+        raise NotImplementedError()
+
+
+
+class IndexReference(object):
+    def __init__(self, vector, index):
+        self.vector = vector
+        self.index = index
+    
+    def get(self):
+        return self.vector[self.index]
+    
+    def set(self, value):
+        self.vector[self.index] = value
+
+    def __str__(self):
+        return str(self.get())

@@ -2,7 +2,7 @@
 
 class Node(object):
     def accept(self, visitor):
-        print("{} accepts {}".format(self.__class__, visitor.__class__))
+        # print("{} accepts {}".format(self.__class__, visitor.__class__))
         return visitor.visit(self)
 
 
@@ -90,6 +90,12 @@ class Variable(Node):
     def __init__(self, lineno, name):
         self.lineno = lineno
         self.name = name
+    
+    def __str__(self):
+        return "AST.Variable({})".format(self.name)
+
+    def __repr__(self):
+        return str(self)
 
 
 class If(Node):
@@ -119,7 +125,6 @@ class Assignment(BinExpr):
 class Literal(Node):
     def __init__(self, lineno, value):
         self.lineno = lineno
-        print("self.value = {}".format(value))
         self.value = value
 
 class String(Literal):

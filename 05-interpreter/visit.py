@@ -53,7 +53,10 @@ class Dispatcher(object):
     else:
       class_to_visitorfun = self.targets
       classes = class_to_visitorfun.iterkeys()
-      return [ class_to_visitorfun[c](*args, **kw) for c in classes if issubclass(typ, c) ]
+      results = [ class_to_visitorfun[c](*args, **kw) for c in classes if issubclass(typ, c) ]
+      if results == []:
+        print("No visitor found for class {}".format(typ))
+      return results
 
   def add_target(self, typ, target):
     self.targets[typ] = target
