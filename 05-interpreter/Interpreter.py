@@ -159,6 +159,32 @@ class Interpreter(object):
             except BreakException:
                 break
 
+    @when(AST.For)
+    def visit(self, node):
+        self.lvalue = True
+        iterator_ref = node.iterator.accept(self)
+        self.lvalue = False
+
+        start, end = node.range.accept(self)
+        self.memories.set(iterator_ref, start)
+
+        while self.memories.get(iterator_ref) < end:
+            try:
+                node.body.accept(self)
+            except ContinueException:
+                pass
+            except BreakException:
+                break
+            iterator_val = self.memories.get(iterator_ref)
+            self.memories.set(iterator_ref, iterator_val + 1)
+
+
+    @when(AST.Range)
+    def visit(self, node):
+        start = node.start.accept(self)
+        end = node.end.accept(self)
+        return start, end
+
 
 class ConcreteReference(AST.Reference):
     """Vector or matrix reference with its container

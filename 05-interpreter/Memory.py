@@ -62,10 +62,17 @@ class MemoryStack:
         return str(self)
 
     def get(self, node):             # gets from memory stack current value of variable <name>
+        result = None
         for m in self.stack[::-1]:
             if m.has_key(node):
-                return m.get(node)
-        return None
+                result = m.get(node)
+                break
+        if result is None:
+            if isinstance(node, AST.Variable):
+                raise KeyError("Variable '{}' does not exist".format(node.name))
+            elif isinstance(node, Interpreter.ConcreteReference):
+                raise KeyError("Variable '{}' does not exist".format(node.container))
+        return result
 
     def insert(self, node, value):  # inserts into memory stack variable <name> with value <value>
         """

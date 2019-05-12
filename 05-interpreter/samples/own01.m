@@ -1,9 +1,13 @@
+N = 4;
+M = 5;
 for i = 1:N {
+    print "first for";
     for j = i:M {
         print i, j;
         continue;
     }
-    break;
+    if (i > 2)
+        break;
 }
 
 
