@@ -42,10 +42,23 @@ def eye(dim1, dim2=None):
     return arr
 
 
+def mul(var1, var2):
+    if not (isinstance(var1, list) and isinstance(var2, list)):
+        return var1 * var2
+    # matrix multiplication
+    dim1, dim2 = len(var1), len(var2[0])
+    trans = transpose(var2)
+    result = zeros(dim1, dim2)
+    for i in range(dim1):
+        for j in range(dim2):
+            result[i][j] = sum(x * y for x, y in zip(var1[i], trans[j]))
+    return result
+
+
 binop_to_operator = {
     '+': operator.add,
     '-': operator.sub,
-    '*': operator.mul,
+    '*': mul,
     '/': operator.div,
     '<': operator.lt,
     '<=': operator.le,
@@ -66,6 +79,7 @@ builtin = {
     'eye': eye
 }
 
+
 def elementwise(op):
     def fun(left, right):
         if isinstance(left, list):
@@ -83,6 +97,7 @@ sys.setrecursionlimit(10000)
 # TODO ensure all AST classes are covered
 
 # TODO implement matrix mul
+
 
 class Interpreter(object):
     memories = MemoryStack()

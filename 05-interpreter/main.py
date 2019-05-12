@@ -32,9 +32,3 @@ if __name__ == '__main__':
                 ast.accept(Interpreter())
             except ReturnValueException as e:
                 print("RETURN: {}".format(e.value))
-
-    # in future
-    # ast.accept(OptimizationPass1())
-    # ast.accept(OptimizationPass2())
-    # ast.accept(CodeGenerator())
-    
