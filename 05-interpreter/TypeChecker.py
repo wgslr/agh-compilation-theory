@@ -165,7 +165,13 @@ class TypeChecker(NodeVisitor):
     def visit_For(self, node):
         # print("visit_For")
         self.loop += 1
+        self.symbols = self.symbols.createChild()
+
+        iterator_var = Variable('int', [], node.iterator.name)
+        self.symbols.put(iterator_var.name, iterator_var)
         self.visit(node.body)
+
+        self.symbols = self.symbols.getParentScope()
         self.loop -= 1
 
     def visit_Range(self, node):
