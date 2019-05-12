@@ -46,25 +46,27 @@ allowed_operations["/"]["matrix"]["int"] = "matrix"
 allowed_operations["/"]["vector"]["float"] = "vector"
 allowed_operations["/"]["matrix"]["float"] = "matrix"
 
-allowed_operations[".+"]["matrix"]["int"] = "matrix"
-allowed_operations[".+"]["matrix"]["float"] = "matrix"
-allowed_operations[".+"]["vector"]["int"] = "vector"
-allowed_operations[".+"]["vector"]["float"] = "vector"
+allowed_operations[".+"]["matrix"]["matrix"] = "matrix"
+allowed_operations[".+"]["vector"]["vector"] = "vector"
 
-allowed_operations[".-"]["matrix"]["int"] = "matrix"
-allowed_operations[".-"]["matrix"]["float"] = "matrix"
-allowed_operations[".-"]["vector"]["int"] = "vector"
-allowed_operations[".-"]["vector"]["float"] = "vector"
+allowed_operations[".+"]["matrix"]["matrix"] = "matrix"
+allowed_operations[".+"]["vector"]["vector"] = "vector"
 
-allowed_operations[".*"]["matrix"]["int"] = "matrix"
-allowed_operations[".*"]["matrix"]["float"] = "matrix"
-allowed_operations[".*"]["vector"]["int"] = "vector"
-allowed_operations[".*"]["vector"]["float"] = "vector"
+allowed_operations[".-"]["matrix"]["matrix"] = "matrix"
+allowed_operations[".-"]["vector"]["vector"] = "vector"
+
+allowed_operations[".*"]["matrix"]["matrix"] = "matrix"
+allowed_operations[".*"]["vector"]["vector"] = "vector"
 
 allowed_operations["./"]["matrix"]["int"] = "matrix"
 allowed_operations["./"]["matrix"]["float"] = "matrix"
 allowed_operations["./"]["vector"]["int"] = "vector"
 allowed_operations["./"]["vector"]["float"] = "vector"
+
+# unary operations - encoded by repeating same type
+allowed_operations["NEGATE"]["int"]["int"] = "int"
+allowed_operations["NEGATE"]["float"]["float"] = "float"
+allowed_operations["TRANSPOSE"]["matrix"]["matrix"] = "matrix"
 
 op_to_string = {
     '+': 'ADD',
@@ -180,7 +182,10 @@ class TypeChecker(NodeVisitor):
 
     def visit_Variable(self, node):
         # print("visit_Variable")
-        return self.symbols.get(node.name)
+        result = self.symbols.get(node.name)
+        if result is None:
+            result = Variable("undefined", [], node.name)
+        return result
 
     def visit_If(self, node):
         # print("visit_if")
@@ -216,7 +221,8 @@ class TypeChecker(NodeVisitor):
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
         if not var2:
-            self.print_error(node, "undefined variable {}".format(node.right.name))
+            # print(node.right.op)
+            # self.print_error(node, "undefined variable {}".format(node.right.name))
             return None
         if isinstance(node.left, AST.Variable):
             name = node.left.name
@@ -247,7 +253,15 @@ class TypeChecker(NodeVisitor):
 
     def visit_UnaryExpr(self, node):
         # print("visit_UnaryExpr")
-        pass
+        operand = self.visit(node.operand)
+        if operand.type == "undefined":
+            self.print_error(node, "undefined variable {}".format(operand.name))
+        newtype = allowed_operations[node.operation][operand.type][operand.type]
+        if newtype:
+            return Variable(newtype, operand.size[::-1])
+        else:
+            self.print_error(node, "cannot perform {} on {}".format(
+                node.operation, operand.type))
 
     def visit_Comparison(self, node):
         # print("visit_Comparison")
