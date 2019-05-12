@@ -12,7 +12,13 @@ binop_to_operator = {
     '+': operator.add,
     '-': operator.sub,
     '*': operator.mul,
-    '/': operator.div
+    '/': operator.div,
+    '<': operator.lt,
+    '<=': operator.le,
+    '>': operator.gt,
+    '>=': operator.ge,
+    '!=': operator.ne,
+    '==': operator.eq,
 }
 
 sys.setrecursionlimit(10000)
@@ -56,6 +62,13 @@ class Interpreter(object):
             n.accept(self)
 
     @when(AST.ArithmeticOperation)
+    def visit(self, node):
+        r1 = node.left.accept(self)
+        r2 = node.right.accept(self)
+        op_fun = binop_to_operator[node.op]
+        return op_fun(r1, r2)
+
+    @when(AST.Comparison)
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
@@ -132,7 +145,7 @@ class Interpreter(object):
     @when(AST.While)
     def visit(self, node):
         r = None
-        while node.cond.accept(self):
+        while node.condition.accept(self):
             r = node.body.accept(self)
         return r
 
