@@ -90,9 +90,7 @@ def p_print(p):
 
 
 def p_print_body(p):
-    """print_body : string
-                  | expression
-                  | string ',' print_body
+    """print_body : expression
                   | expression ',' print_body"""
     if len(p) == 2:
         p[0] = [p[1]]
@@ -292,6 +290,7 @@ def p_numeric_expression(p):
     """numeric_expression : num
                           | matrix
                           | vector
+                          | string
                           | unary_op
                           | fun
                           | '(' numeric_expression ')'"""

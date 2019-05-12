@@ -27,7 +27,7 @@ if __name__ == '__main__':
         typeChecker = TypeChecker()
         typeChecker.visit(ast)
 
-        if not typeChecker.error_occured:
+        if not typeChecker.encountered_error:
             ast.accept(Interpreter())
 
     # in future

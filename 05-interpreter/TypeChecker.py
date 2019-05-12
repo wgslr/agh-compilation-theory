@@ -85,7 +85,7 @@ class NodeVisitor(object):
 
 
 class TypeChecker(NodeVisitor):
-    error_occured = False
+    encountered_error = False
 
     def visit_Block(self, node):
         # print("visit_Instructions")
@@ -216,6 +216,7 @@ class TypeChecker(NodeVisitor):
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
         if not var2:
+            self.print_error(node, "undefined variable {}".format(node.right.name))
             return None
         if isinstance(node.left, AST.Variable):
             name = node.left.name
@@ -257,6 +258,6 @@ class TypeChecker(NodeVisitor):
         pass
 
     def print_error(self, node, error):
-        self.error_occured = True
+        self.encountered_error = True
         print("Error in line {}: {}".format(node.lineno, error))
 
