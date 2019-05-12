@@ -13,6 +13,9 @@ class Variable(object):
     def __repr__(self):
         return str(self)
 
+    def isUndefined(self):
+        return self.type == "undefined"
+
 
 class SymbolTable(object):
 

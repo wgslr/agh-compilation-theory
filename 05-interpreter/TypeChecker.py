@@ -79,6 +79,9 @@ op_to_string = {
     '/=': 'DIV-ASSIGN',
 }
 
+class Undefined(Variable):
+    def __init__(self, name = ""):
+        Variable.__init__(self, 'undefined', [], name)
 
 class NodeVisitor(object):
     loop = 0
@@ -143,31 +146,58 @@ class TypeChecker(NodeVisitor):
 
     def visit_Reference(self, node, *args, **kwargs):
         # print("visit_Reference")
-        v = self.symbols.get(node.container.name)
-        if not v:
-            self.print_error(node, "undefined variable {}".format(node.container.name))
-            return None
-        if len(node.coords) > len(v.size):
-            self.print_error(node, "to many dimensions in vector reference")
-            return None
+
+        container = self.visit(node.container)
+        if container.isUndefined():
+            return Undefined()
+
+        if len(node.coords) > len(container.size):
+            self.print_error(node, "too many dimensions in vector reference")
+            return Undefined()
+
         error = False
-        for coord, size in zip(node.coords, v.size):
-            if isinstance(coord, AST.IntNum) and coord.value >= size:
-                self.print_error(node, "reference {} is over vector size {}".format(coord.value, size))
+
+        for c in node.coords:
+            c_var = self.visit(c)
+            if c_var.type != 'int':
+                self.print_error(node, "expected int as array coordinate, found {}".format(c_var.type))
                 error = True
         if error:
-            return None
-        if len(v.size) - len(node.coords) == 0:
+            return Undefined()
+
+        for coord, size in zip(node.coords, container.size):
+            if coord.value >= size:
+                self.print_error(node, "reference {} out of bounds for size {}".format(coord.value, size))
+                error = True
+
+        if error:
+            return Undefined()
+        if len(container.size) - len(node.coords) == 0:
             return Variable("float")
         else:
-            return Variable("vector", [v.size[-1]])
+            return Variable("vector", [container.size[-1]])
 
     def visit_FunctionCall(self, node):
         # print("visit_FunctionCall")
         arguments = node.arguments
+
+        for arg in arguments:
+            arg_var = self.visit(arg)
+            if arg_var.type != 'int':
+                self.print_error(node, "expected int as array size, found {}".format(arg_var.type))
+                return Undefined()
+
         if len(arguments) == 1:
             arguments = [arguments[0], arguments[0]]
-        return Variable("matrix", [x.value for x in arguments])
+
+        bounds = [0, 0]
+        for i, arg in enumerate(arguments):
+            if isinstance(arg, AST.IntNum):
+                bounds[i] = arg.value
+            else:
+                bounds[i] = float('+inf')
+        print "bounds: ", bounds
+        return Variable("matrix", bounds)
 
     def visit_While(self, node):
         # print("visit_While")
@@ -197,7 +227,7 @@ class TypeChecker(NodeVisitor):
         if result is None:
             if not allow_undefined:
                 self.print_error(node, "undefined variable {}".format(node.name))
-            result = Variable("undefined", [], node.name)
+            result = Undefined(node.name)
         return result
 
     def visit_If(self, node):
