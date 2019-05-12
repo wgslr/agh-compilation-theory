@@ -85,6 +85,7 @@ class NodeVisitor(object):
 
 
 class TypeChecker(NodeVisitor):
+    error_occured = False
 
     def visit_Block(self, node):
         # print("visit_Instructions")
@@ -100,7 +101,7 @@ class TypeChecker(NodeVisitor):
     def visit_FlowKeyword(self, node):
         # print("visit_Flowkeyword")
         if self.loop == 0:
-            TypeChecker.print_error(node, "flow keyword {} outside loop".format(node.keyword))
+            self.print_error(node, "flow keyword {} outside loop".format(node.keyword))
 
     def visit_Print(self, node):
         # print("visit_Print")
@@ -120,7 +121,7 @@ class TypeChecker(NodeVisitor):
         if all(x == size2 for x in sizes):
             return Variable("matrix", [size1, size2])
         else:
-            TypeChecker.print_error(node, "vectors with different sizes in matrix initialization")
+            self.print_error(node, "vectors with different sizes in matrix initialization")
             return None
 
     def visit_Vector(self, node):
@@ -131,15 +132,15 @@ class TypeChecker(NodeVisitor):
         # print("visit_Reference")
         v = self.symbols.get(node.container.name)
         if not v:
-            TypeChecker.print_error(node, "undefined variable {}".format(node.container.name))
+            self.print_error(node, "undefined variable {}".format(node.container.name))
             return None
         if len(node.coords) > len(v.size):
-            TypeChecker.print_error(node, "to many dimensions in vector reference")
+            self.print_error(node, "to many dimensions in vector reference")
             return None
         error = False
         for coord, size in zip(node.coords, v.size):
             if isinstance(coord, AST.IntNum) and coord.value >= size:
-                TypeChecker.print_error(node, "reference {} is over vector size {}".format(coord.value, size))
+                self.print_error(node, "reference {} is over vector size {}".format(coord.value, size))
                 error = True
         if error:
             return None
@@ -185,10 +186,10 @@ class TypeChecker(NodeVisitor):
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
         if not var1:
-            TypeChecker.print_error(node, "undefined variable {}".format(node.left.name))
+            self.print_error(node, "undefined variable {}".format(node.left.name))
             return None
         if not var2:
-            TypeChecker.print_error(node, "undefined variable {}".format(node.right.name))
+            self.print_error(node, "undefined variable {}".format(node.right.name))
             return None
         op = node.op
         newtype = allowed_operations[op[0]][var1.type][var2.type]
@@ -197,7 +198,7 @@ class TypeChecker(NodeVisitor):
             new_var.type = newtype
             return new_var
         else:
-            TypeChecker.print_error(node, "cannot {} {} and {}".format(op_to_string[op], var1.type, var2.type))
+            self.print_error(node, "cannot {} {} and {}".format(op_to_string[op], var1.type, var2.type))
             return None
 
     def visit_ArithmeticOperation(self, node):
@@ -220,14 +221,14 @@ class TypeChecker(NodeVisitor):
             self.symbols.put(name, symbol)
         else:
             if not var1:
-                TypeChecker.print_error(node, "undefined variable {}".format(name))
+                self.print_error(node, "undefined variable {}".format(name))
                 return None
             newtype = allowed_operations[op[0]][var1.type][var2.type]
             if newtype:
                 symbol = Variable(newtype, var2.size, name)
                 self.symbols.put(name, symbol)
             else:
-                TypeChecker.print_error(node, "cannot assign {} to {}".format(var2.type, var1.type))
+                self.print_error(node, "cannot assign {} to {}".format(var2.type, var1.type))
 
     def visit_IntNum(self, node):
         # print("visit_IntNum")
@@ -249,7 +250,7 @@ class TypeChecker(NodeVisitor):
         # print("visit_Error")
         pass
 
-    @staticmethod
-    def print_error(node, error):
+    def print_error(self, node, error):
+        self.error_occured = True
         print("Error in line {}: {}".format(node.lineno, error))
 
