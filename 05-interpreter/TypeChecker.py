@@ -49,19 +49,14 @@ allowed_operations["/"]["matrix"]["float"] = "matrix"
 allowed_operations[".+"]["matrix"]["matrix"] = "matrix"
 allowed_operations[".+"]["vector"]["vector"] = "vector"
 
-allowed_operations[".+"]["matrix"]["matrix"] = "matrix"
-allowed_operations[".+"]["vector"]["vector"] = "vector"
-
 allowed_operations[".-"]["matrix"]["matrix"] = "matrix"
 allowed_operations[".-"]["vector"]["vector"] = "vector"
 
 allowed_operations[".*"]["matrix"]["matrix"] = "matrix"
 allowed_operations[".*"]["vector"]["vector"] = "vector"
 
-allowed_operations["./"]["matrix"]["int"] = "matrix"
-allowed_operations["./"]["matrix"]["float"] = "matrix"
-allowed_operations["./"]["vector"]["int"] = "vector"
-allowed_operations["./"]["vector"]["float"] = "vector"
+allowed_operations["./"]["matrix"]["matrix"] = "matrix"
+allowed_operations["./"]["vector"]["vector"] = "vector"
 
 # unary operations - encoded by repeating same type
 allowed_operations["NEGATE"]["int"]["int"] = "int"
@@ -161,7 +156,7 @@ class TypeChecker(NodeVisitor):
             return Variable("vector", [v.size[-1]])
 
     def visit_FunctionCall(self, node):
-        print("visit_FunctionCall")
+        # print("visit_FunctionCall")
         arguments = node.arguments
         if len(arguments) == 1:
             arguments = [arguments[0], arguments[0]]
@@ -212,7 +207,7 @@ class TypeChecker(NodeVisitor):
             # self.print_error(node, "undefined variable {}".format(node.right.name))
             return None
         op = node.op
-        newtype = allowed_operations[op[0]][var1.type][var2.type]
+        newtype = allowed_operations[op][var1.type][var2.type]
         if newtype:
             new_var = copy(var1)
             new_var.type = newtype

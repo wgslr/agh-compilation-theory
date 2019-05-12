@@ -66,6 +66,14 @@ builtin = {
     'eye': eye
 }
 
+def elementwise(op):
+    def fun(left, right):
+        if isinstance(left, list):
+            return [fun(l, r) for l, r in zip(left, right)]
+        else:
+            return binop_to_operator[op[1]](left, right)
+    return fun
+
 
 sys.setrecursionlimit(10000)
 
@@ -197,7 +205,10 @@ class Interpreter(object):
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
-        op_fun = binop_to_operator[node.op]
+        if node.op[0] == '.':
+            op_fun = elementwise(node.op)
+        else:
+            op_fun = binop_to_operator[node.op]
         return op_fun(r1, r2)
 
     @when(AST.Assignment)
