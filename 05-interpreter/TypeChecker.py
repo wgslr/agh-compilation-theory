@@ -5,7 +5,8 @@ from copy import copy
 import AST
 from SymbolTable import Variable, SymbolTable
 
-allowed_operations = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: "")))
+allowed_operations = defaultdict(
+    lambda: defaultdict(lambda: defaultdict(lambda: "")))
 
 allowed_operations["+"]["int"]["int"] = "int"
 allowed_operations["+"]["float"]["int"] = "float"
@@ -79,9 +80,11 @@ op_to_string = {
     '/=': 'DIV-ASSIGN',
 }
 
+
 class Undefined(Variable):
-    def __init__(self, name = ""):
+    def __init__(self, name=""):
         Variable.__init__(self, 'undefined', [], name)
+
 
 class NodeVisitor(object):
     loop = 0
@@ -115,7 +118,8 @@ class TypeChecker(NodeVisitor):
     def visit_FlowKeyword(self, node):
         # print("visit_Flowkeyword")
         if self.loop == 0:
-            self.print_error(node, "flow keyword {} must be used inside a loop".format(node.keyword))
+            self.print_error(
+                node, "flow keyword {} must be used inside a loop".format(node.keyword))
 
     def visit_Print(self, node):
         # print("visit_Print")
@@ -137,7 +141,8 @@ class TypeChecker(NodeVisitor):
         if all(x == size2 for x in sizes):
             return Variable("matrix", [size1, size2])
         else:
-            self.print_error(node, "vectors with different sizes in matrix initialization")
+            self.print_error(
+                node, "vectors with different sizes in matrix initialization")
             return None
 
     def visit_Vector(self, node):
@@ -160,14 +165,16 @@ class TypeChecker(NodeVisitor):
         for c in node.coords:
             c_var = self.visit(c)
             if c_var.type != 'int':
-                self.print_error(node, "expected int as array coordinate, found {}".format(c_var.type))
+                self.print_error(
+                    node, "expected int as array coordinate, found {}".format(c_var.type))
                 error = True
         if error:
             return Undefined()
 
         for coord, size in zip(node.coords, container.size):
             if coord.value >= size:
-                self.print_error(node, "reference {} out of bounds for size {}".format(coord.value, size))
+                self.print_error(
+                    node, "reference {} out of bounds for size {}".format(coord.value, size))
                 error = True
 
         if error:
@@ -184,7 +191,8 @@ class TypeChecker(NodeVisitor):
         for arg in arguments:
             arg_var = self.visit(arg)
             if arg_var.type != 'int':
-                self.print_error(node, "expected int as array size, found {}".format(arg_var.type))
+                self.print_error(
+                    node, "expected int as array size, found {}".format(arg_var.type))
                 return Undefined()
 
         if len(arguments) == 1:
@@ -196,7 +204,6 @@ class TypeChecker(NodeVisitor):
                 bounds[i] = arg.value
             else:
                 bounds[i] = float('+inf')
-        print "bounds: ", bounds
         return Variable("matrix", bounds)
 
     def visit_While(self, node):
@@ -207,6 +214,8 @@ class TypeChecker(NodeVisitor):
 
     def visit_For(self, node):
         # print("visit_For")
+        self.visit(node.range)
+
         self.loop += 1
         self.symbols = self.symbols.createChild()
 
@@ -219,14 +228,16 @@ class TypeChecker(NodeVisitor):
 
     def visit_Range(self, node):
         # print("visit_Range")
-        pass
+        self.visit(node.start)
+        self.visit(node.end)
 
-    def visit_Variable(self, node, allow_undefined = False):
+    def visit_Variable(self, node, allow_undefined=False):
         # print("visit_Variable")
         result = self.symbols.get(node.name)
         if result is None:
             if not allow_undefined:
-                self.print_error(node, "undefined variable {}".format(node.name))
+                self.print_error(
+                    node, "undefined variable {}".format(node.name))
             result = Undefined(node.name)
         return result
 
@@ -240,7 +251,8 @@ class TypeChecker(NodeVisitor):
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
         if not var1:
-            self.print_error(node, "undefined variable {}".format(node.left.name))
+            self.print_error(
+                node, "undefined variable {}".format(node.left.name))
             return None
         if not var2:
             # self.print_error(node, "undefined variable {}".format(node.right.name))
@@ -252,7 +264,8 @@ class TypeChecker(NodeVisitor):
             new_var.type = newtype
             return new_var
         else:
-            self.print_error(node, "cannot {} {} and {}".format(op_to_string[op], var1.type, var2.type))
+            self.print_error(node, "cannot {} {} and {}".format(
+                op_to_string[op], var1.type, var2.type))
             return None
 
     def visit_ArithmeticOperation(self, node):
@@ -263,39 +276,59 @@ class TypeChecker(NodeVisitor):
         # print("visit_Assignment")
 
         op = node.op
-        allow_undefined = op == "="
+        overwrite = op == "="
 
-        var1 = self.visit(node.left, allow_undefined)
+        var1 = self.visit(node.left, overwrite)
         var2 = self.visit(node.right)
-        if not var2:
-            print(node.lineno, node.right)
-            # print(node.right.op)
-            # self.print_error(node, "undefined variable {}".format(node.right.name))
+
+        is_slice = isinstance(node.left, AST.Reference)
+
+        if not overwrite and var1.isUndefined():
             return None
 
         if var2.type == "undefined":
-            self.print_error(node, "undefined variable {}".format(node.right.name))
+            self.print_error(
+                node, "undefined variable {}".format(node.right.name))
 
-
-        if isinstance(node.left, AST.Variable):
-            name = node.left.name
-        else:
-            name = node.left.container.name
-
-        if op == "=":
-            symbol = Variable(var2.type, var2.size, name)
-            self.symbols.put(name, symbol)
-        else:
-            if not var1:
-                self.print_error(node, "undefined variable {}".format(name))
+        if is_slice:
+            if var1.type == 'vector' and var2.type != 'vector':
+                self.print_error(
+                    node, "cannot assing {} to a matrix slice, expected vector".format(var2.type))
                 return None
-            newtype = allowed_operations[op[0]][var1.type][var2.type]
-            if newtype:
-                symbol = Variable(newtype, var2.size, name)
-                self.symbols.put(name, symbol)
+            if var1.type == 'vector' and var2.size != var1.size[1]:
+                self.print_error(node, "vector sized {} does not match matrix dimensions".format(var2.size))
+                return None
+            # visiting reference always returns float when all dimensions are unpacked
+            if var1.type == 'float':
+                if var2.type not in ('int', 'float'):
+                    self.print_error(node, 'Matrix element must be INT or FLOAT')
+                    return None
+                
+        else:
+            if overwrite:
+                new_var = Variable(var2.type, var2.size, var1.name)
+                self.symbols.put(var1.name, new_var)
             else:
-                op_str = op_to_string[op]
-                self.print_error(node, "cannot {} {} to {}".format(op_str, var2.type, var1.type))
+                new_type  = allowed_operations[op[0]][var1.type][var2.type]
+                if new_type != "":
+                    new_var = Variable(new_type, var2.size, name)
+                    self.symbols.put(var1.name, new_var)
+                else:
+                    op_str=op_to_string[op]
+                    self.print_error(node, "cannot {} {} to {}".format(
+                        op_str, var2.type, var1.type))
+
+    @classmethod
+    def result_size(_self, op, var1, var2):
+        if var1.type != 'matrix' or var2.type != 'matrix':
+            return var1.size
+
+        if op == "*":
+            return [var1.size[0], var2.size[1]]
+        elif op == "+":
+            return [var1.size[0] + var2.size[0], var1.size[1]]
+        else:
+            return var1.size
 
     def visit_IntNum(self, node):
         # print("visit_IntNum")
@@ -307,10 +340,11 @@ class TypeChecker(NodeVisitor):
 
     def visit_UnaryExpr(self, node):
         # print("visit_UnaryExpr")
-        operand = self.visit(node.operand)
+        operand=self.visit(node.operand)
         if operand.type == "undefined":
-            self.print_error(node, "undefined variable {}".format(operand.name))
-        newtype = allowed_operations[node.operation][operand.type][operand.type]
+            self.print_error(
+                node, "undefined variable {}".format(operand.name))
+        newtype=allowed_operations[node.operation][operand.type][operand.type]
         if newtype:
             return Variable(newtype, operand.size[::-1])
         else:
@@ -326,6 +360,5 @@ class TypeChecker(NodeVisitor):
         pass
 
     def print_error(self, node, error):
-        self.encountered_error = True
+        self.encountered_error=True
         print("Error in line {}: {}".format(node.lineno, error))
-
