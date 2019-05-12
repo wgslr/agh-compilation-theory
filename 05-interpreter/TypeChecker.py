@@ -69,10 +69,19 @@ allowed_operations["NEGATE"]["float"]["float"] = "float"
 allowed_operations["TRANSPOSE"]["matrix"]["matrix"] = "matrix"
 
 op_to_string = {
+    '=': 'ASSIGN',
     '+': 'ADD',
     '-': 'SUB',
     '*': 'MUL',
     '/': 'DIV',
+    '.+': 'DOT-ADD',
+    '.-': 'DOT-SUB',
+    '.*': 'DOT-MUL',
+    './': 'DOT-DIV',
+    '+=': 'ADD-ASSIGN',
+    '-=': 'SUB-ASSIGN',
+    '*=': 'MUL-ASSIGN',
+    '/=': 'DIV-ASSIGN',
 }
 
 
@@ -200,7 +209,7 @@ class TypeChecker(NodeVisitor):
             self.print_error(node, "undefined variable {}".format(node.left.name))
             return None
         if not var2:
-            self.print_error(node, "undefined variable {}".format(node.right.name))
+            # self.print_error(node, "undefined variable {}".format(node.right.name))
             return None
         op = node.op
         newtype = allowed_operations[op[0]][var1.type][var2.type]
@@ -221,9 +230,15 @@ class TypeChecker(NodeVisitor):
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
         if not var2:
+            print(node.lineno, node.right)
             # print(node.right.op)
             # self.print_error(node, "undefined variable {}".format(node.right.name))
             return None
+
+        if var2.type == "undefined":
+            self.print_error(node, "undefined variable {}".format(node.right.name))
+
+
         if isinstance(node.left, AST.Variable):
             name = node.left.name
         else:
@@ -241,7 +256,8 @@ class TypeChecker(NodeVisitor):
                 symbol = Variable(newtype, var2.size, name)
                 self.symbols.put(name, symbol)
             else:
-                self.print_error(node, "cannot assign {} to {}".format(var2.type, var1.type))
+                op_str = op_to_string[op]
+                self.print_error(node, "cannot {} {} to {}".format(op_str, var2.type, var1.type))
 
     def visit_IntNum(self, node):
         # print("visit_IntNum")
