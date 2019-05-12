@@ -1,20 +1,20 @@
-N = 4;
-M = 5;
-for i = 1:N {
-    i += 3;
-    print "first for";
-    for j = i:M {
-        print i, j;
+N = 32;
+
+for N = 1 : N / 2 {
+    if ((N / 2) * 2 == N)
         continue;
-    }
-    if (i > 2)
+    print N;
+
+    if (N > 12) {
         break;
+    }
 }
 
 
-for a = 3:5
-    b = a;
-
+x = "a string";
 {
-    e = "naked block";
+    x = 100;
+    print x;
 }
+
+print x;

@@ -53,7 +53,7 @@ class MemoryStack:
         self.stack = [Memory()]
 
     def __str__(self):
-        s = "MEMORY [\n"
+        s = "MEMORYSTACK [\n"
         for m in self.stack:
             s += str(m) + "\n"
         return s + "]"
@@ -92,31 +92,10 @@ class MemoryStack:
         else:
             self.insert(node, value)
 
-    def push(self, memory = Memory()):  # pushes memory <memory> onto the stack
+    def push(self, memory = None):  # pushes memory <memory> onto the stack
+        if memory is None:
+            memory = Memory()
         self.stack.append(memory)
 
     def pop(self):          # pops the top memory from the stack
         return self.stack.pop()
-
-
-# class Reference(object):
-#     def get(self):
-#         raise NotImplementedError()
-#     def set(self, value):
-#         raise NotImplementedError()
-
-
-
-# class IndexReference(object):
-#     def __init__(self, vector, index):
-#         self.vector = vector
-#         self.index = index
-    
-#     def get(self):
-#         return self.vector[self.index]
-    
-#     def set(self, value):
-#         self.vector[self.index] = value
-
-#     def __str__(self):
-#         return str(self.get())

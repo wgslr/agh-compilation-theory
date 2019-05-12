@@ -222,7 +222,7 @@ class Interpreter(object):
 
         if node.op == "=":
             value = node.right.accept(self)
-            self.memories.set(target_ref, value)
+            self.memories.insert(target_ref, value)
         else:
             # TODO ensure it works for dot-operations
             op_fun = binop_to_operator[node.op[0]]
