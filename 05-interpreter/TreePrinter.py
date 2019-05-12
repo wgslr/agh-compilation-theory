@@ -49,7 +49,7 @@ class TreePrinter:
 
     @addToClass(AST.String)
     def printTree(self, indent=0):
-        print(TreePrinter.makeIndent(indent) + self.value)
+        print(TreePrinter.makeIndent(indent) + '"{}"'.format(self.value))
 
     @addToClass(AST.Vector)
     def printTree(self, indent=0):

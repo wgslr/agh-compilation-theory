@@ -112,7 +112,8 @@ def p_return(p):
 
 def p_string(p):
     """string : STRING"""
-    p[0] = AST.String(p.lineno(1), p[1])
+    # strip quote marks
+    p[0] = AST.String(p.lineno(1), p[1][1:-1])
 
 # -------------------------
 # Matrices
