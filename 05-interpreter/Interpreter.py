@@ -27,6 +27,8 @@ sys.setrecursionlimit(10000)
 # TODO make TypeChecker throw error when using undefined variable
 # in rhs context
 
+# TODO ensure all AST classes are covered
+
 class Interpreter(object):
     memories = MemoryStack()
 
@@ -43,7 +45,6 @@ class Interpreter(object):
         self.memories.push()
         node.content.accept(self)
         self.memories.pop()
-
 
     @when(AST.FlowKeyword)
     def visit(self, node):
@@ -85,7 +86,7 @@ class Interpreter(object):
             value = node.right.accept(self)
             self.memories.set(target_ref, value)
         else:
-            # TODO ensure it works for dot-operations 
+            # TODO ensure it works for dot-operations
             op_fun = binop_to_operator[node.op[0]]
 
             rhs = node.right.accept(self)
@@ -141,13 +142,22 @@ class Interpreter(object):
     def visit(self, node):
         return node.value
 
-    # simplistic while loop interpretation
+    @when(AST.If)
+    def visit(self, node):
+        if node.condition.accept(self):
+            node.body.accept(self)
+        elif node.else_body is not None:
+            node.else_body.accept(self)
+
     @when(AST.While)
     def visit(self, node):
-        r = None
         while node.condition.accept(self):
-            r = node.body.accept(self)
-        return r
+            try:
+                node.body.accept(self)
+            except ContinueException:
+                continue
+            except BreakException:
+                break
 
 
 class ConcreteReference(AST.Reference):
