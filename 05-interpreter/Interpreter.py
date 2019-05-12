@@ -122,6 +122,22 @@ class Interpreter(object):
         else:
             return self.memories.get(reference)
 
+    @when(AST.FunctionCall)
+    def visit(self, node):
+        [dim1, dim2] = node.arguments if len(node.arguments) == 2 \
+            else [node.arguments[0], node.arguments[0]]
+        dim1, dim2 = dim1.accept(self), dim2.accept(self)
+
+        if node.name == "ones":
+            return [[1] * dim2 for _ in range(dim1)]
+        elif node.name == "zeros":
+            return [[0] * dim2 for _ in range(dim1)]
+        elif node.name == "eye":
+            arr = [[0] * dim2 for _ in range(dim1)]
+            for i in range(min(dim1 ,dim2)):
+                arr[i][i] = 1
+            return arr
+
     @when(AST.IntNum)
     def visit(self, node):
         return node.value
@@ -177,7 +193,6 @@ class Interpreter(object):
                 break
             iterator_val = self.memories.get(iterator_ref)
             self.memories.set(iterator_ref, iterator_val + 1)
-
 
     @when(AST.Range)
     def visit(self, node):
