@@ -61,11 +61,13 @@ class Interpreter(object):
 
     @when(AST.Assignment)
     def visit(self, node):
-        print("inteprete assignemnt: {} {} {}".format(node.left, node.op, node.right))
+        print("inteprete assignemnt: {} {} {}".format(
+            node.left, node.op, node.right))
         # TODO make it work for matrices on lhs
 
         self.lvalue = True
         var = node.left.accept(self)
+        print("var: {}".format(var))
         self.lvalue = False
 
         if node.op == "=":
@@ -75,31 +77,37 @@ class Interpreter(object):
         else:
             rhs = node.right.accept(self)
             op_fun = binop_to_operator[node.op[0]]
-            value = op_fun(node.left.accept(self), rhs) 
+            print("node.left.accept")
+            value = op_fun(node.left.accept(self), rhs)
             self.memories.insert(var, value)
 
     @when(AST.Print)
     def visit(self, node):
-        print "PRINT: " + ", ".join((str(arg.accept(self)) for arg in node.arguments))
+        print "PRINT: " + ", ".join((str(arg.accept(self))
+                                     for arg in node.arguments))
 
     @when(AST.Variable)
     def visit(self, node):
         if self.lvalue:
+            print("return node since lvalue")
             return node
         return self.memories.get(node)
 
     @when(AST.Reference)
     def visit(self, node):
-        node2 = copy.deepcopy(node)
         lvalue = self.lvalue
         self.lvalue = False
-        print("resolve {} in {}".format(node2.coords, node2))
-        node2.coords = [c.accept(self) for c in node2.coords]
+
+        reference = ConcreteReference(
+            node.lineno,
+            node.container,
+            [c.accept(self) for c in node.coords]
+        )
 
         if lvalue:
-            return node2
+            return reference
         else:
-            return self.memories.get(node2)
+            return self.memories.get(reference)
 
     @when(AST.IntNum)
     def visit(self, node):
@@ -128,3 +136,9 @@ class Interpreter(object):
         while node.cond.accept(self):
             r = node.body.accept(self)
         return r
+
+
+class ConcreteReference(AST.Reference):
+    """Vector or matrix reference with its container
+    and coordinates resolved to concerte values"""
+    pass

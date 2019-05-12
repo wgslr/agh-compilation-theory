@@ -1,5 +1,6 @@
 
 import AST
+import Interpreter
 
 class Memory:
 
@@ -15,7 +16,8 @@ class Memory:
     def has_key(self, node):  # variable name
         if isinstance(node, AST.Variable):
             return self.variables.get(node.name)
-        elif isinstance(node, AST.Reference):
+        elif isinstance(node, Interpreter.ConcreteReference):
+            print(node.container)
             return self.variables.get(node.container.name)
         else:
             raise TypeError("{} is not a memory reference".format(node.__class__))
@@ -25,7 +27,7 @@ class Memory:
         if isinstance(node, AST.Variable):
             print("getting variable")
             return self.variables.get(node.name)
-        elif isinstance(node, AST.Reference):
+        elif isinstance(node, Interpreter.ConcreteReference):
             print("getting reference")
             value = self.get(node.container)
             for coord in node.coords:
@@ -41,7 +43,7 @@ class Memory:
         if isinstance(node, AST.Variable):
             print("setting variable")
             self.variables[node.name] = value
-        elif isinstance(node, AST.Reference):
+        elif isinstance(node, Interpreter.ConcreteReference):
             print("setting reference")
             container = self.variables[node.container.name]
             for coord in node.coords[:-1]:
