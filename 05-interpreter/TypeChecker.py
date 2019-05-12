@@ -84,14 +84,20 @@ class NodeVisitor(object):
     loop = 0
     symbols = SymbolTable()
 
-    def visit(self, node):
+    def visit(self, node, *args, **kwargs):
         method = 'visit_' + node.__class__.__name__
         visitor = getattr(self, method)
-        return visitor(node)
+        return visitor(node, *args, **kwargs)
 
 
 class TypeChecker(NodeVisitor):
     encountered_error = False
+
+    def ensure_defined(self, node, variable):
+        if variable.type == "undefined":
+            self.print_error(node, "undefined variable")
+            return False
+        return True
 
     def visit_Block(self, node):
         # print("visit_Instructions")
@@ -101,26 +107,27 @@ class TypeChecker(NodeVisitor):
 
     def visit_Instructions(self, node):
         # print("visit_Instructions")
-        for n in node.nodes:
-            self.visit(n)
+        map(self.visit, node.nodes)
 
     def visit_FlowKeyword(self, node):
         # print("visit_Flowkeyword")
         if self.loop == 0:
-            self.print_error(node, "flow keyword {} outside loop".format(node.keyword))
+            self.print_error(node, "flow keyword {} must be used inside a loop".format(node.keyword))
 
     def visit_Print(self, node):
         # print("visit_Print")
-        pass
+        map(self.visit, node.arguments)
 
     def visit_Return(self, node):
         # print("visit_Return")
-        pass
+        if node.value is not None:
+            self.visit(node.value)
 
     def visit_String(self, node):
         return Variable("string")
 
     def visit_Matrix(self, node):
+        map(self.visit, node.elements)
         size1 = len(node.elements)
         sizes = map(lambda x: len(x.elements), node.elements)
         size2 = min(sizes)
@@ -131,10 +138,10 @@ class TypeChecker(NodeVisitor):
             return None
 
     def visit_Vector(self, node):
-        # print("visit_Vector")
+        map(self.visit, node.elements)
         return Variable("vector", [len(node.elements)])
 
-    def visit_Reference(self, node):
+    def visit_Reference(self, node, *args, **kwargs):
         # print("visit_Reference")
         v = self.symbols.get(node.container.name)
         if not v:
@@ -184,10 +191,12 @@ class TypeChecker(NodeVisitor):
         # print("visit_Range")
         pass
 
-    def visit_Variable(self, node):
+    def visit_Variable(self, node, allow_undefined = False):
         # print("visit_Variable")
         result = self.symbols.get(node.name)
         if result is None:
+            if not allow_undefined:
+                self.print_error(node, "undefined variable {}".format(node.name))
             result = Variable("undefined", [], node.name)
         return result
 
@@ -222,7 +231,11 @@ class TypeChecker(NodeVisitor):
 
     def visit_Assignment(self, node):
         # print("visit_Assignment")
-        var1 = self.visit(node.left)
+
+        op = node.op
+        allow_undefined = op == "="
+
+        var1 = self.visit(node.left, allow_undefined)
         var2 = self.visit(node.right)
         if not var2:
             print(node.lineno, node.right)
@@ -238,7 +251,7 @@ class TypeChecker(NodeVisitor):
             name = node.left.name
         else:
             name = node.left.container.name
-        op = node.op
+
         if op == "=":
             symbol = Variable(var2.type, var2.size, name)
             self.symbols.put(name, symbol)

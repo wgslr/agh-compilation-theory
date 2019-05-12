@@ -84,6 +84,7 @@ sys.setrecursionlimit(10000)
 
 # TODO implement matrix mul
 
+# TODO handle return
 
 class Interpreter(object):
     memories = MemoryStack()
