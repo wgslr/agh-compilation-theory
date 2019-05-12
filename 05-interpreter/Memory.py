@@ -78,14 +78,14 @@ class MemoryStack:
         Sets variable identified by <node> to value <value> in the scope where
         it was declared. Creates new local variable if undefined.
         """
-        for m in stack[::-1]:
+        for m in self.stack[::-1]:
             if m.has_key(node):
                 m.put(node, value)
                 break
         else:
             self.insert(node, value)
 
-    def push(self, memory):  # pushes memory <memory> onto the stack
+    def push(self, memory = Memory()):  # pushes memory <memory> onto the stack
         self.stack.append(memory)
 
     def pop(self):          # pops the top memory from the stack

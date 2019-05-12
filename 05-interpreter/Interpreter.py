@@ -34,7 +34,10 @@ class Interpreter(object):
 
     @when(AST.Block)
     def visit(self, node):
-        return node.content.accept(self)
+        self.memories.push()
+        node.content.accept(self)
+        self.memories.pop()
+
 
     @when(AST.FlowKeyword)
     def visit(self, node):
@@ -67,7 +70,7 @@ class Interpreter(object):
 
         if node.op == "=":
             value = node.right.accept(self)
-            self.memories.insert(target_ref, value)
+            self.memories.set(target_ref, value)
         else:
             # TODO ensure it works for dot-operations 
             op_fun = binop_to_operator[node.op[0]]
@@ -76,7 +79,7 @@ class Interpreter(object):
             lhs_value = node.left.accept(self)
             value = op_fun(lhs_value, rhs)
 
-            self.memories.insert(target_ref, value)
+            self.memories.set(target_ref, value)
 
     @when(AST.Print)
     def visit(self, node):

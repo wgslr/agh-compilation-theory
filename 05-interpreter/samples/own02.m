@@ -1,8 +1,11 @@
-    x = 3;
-    y = 4;
-    {
+a = "";
+x = 3;
+y = 4;
+{
     y = "abc";
     a = "55";
     z = y + a;
-    }
-    z = x + y;
+    print z;
+}
+z = x + y;
+print z;
