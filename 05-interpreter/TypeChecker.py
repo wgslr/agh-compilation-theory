@@ -129,9 +129,9 @@ class TypeChecker(NodeVisitor):
 
     def visit_Reference(self, node):
         # print("visit_Reference")
-        v = self.symbols.get(node.name.name)
+        v = self.symbols.get(node.container.name)
         if not v:
-            TypeChecker.print_error(node, "undefined variable {}".format(node.name.name))
+            TypeChecker.print_error(node, "undefined variable {}".format(node.container.name))
             return None
         if len(node.coords) > len(v.size):
             TypeChecker.print_error(node, "to many dimensions in vector reference")
@@ -210,7 +210,12 @@ class TypeChecker(NodeVisitor):
         var2 = self.visit(node.right)
         if not var2:
             return None
-        name = node.left.name
+        print("node.left: {} var1: {}".format(node.left.name, var1))
+        # print(var1.type)
+        if isinstance(node.left, AST.Variable):
+            name = node.left.name
+        else:
+            name = node.left.container.name
         op = node.op
         if op == "=":
             symbol = Variable(var2.type, var2.size, name)

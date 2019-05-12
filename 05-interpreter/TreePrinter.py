@@ -66,7 +66,7 @@ class TreePrinter:
     @addToClass(AST.Reference)
     def printTree(self, indent=0):
         print(TreePrinter.makeIndent(indent) + "REF")
-        self.name.printTree(indent + 1)
+        self.container.printTree(indent + 1)
         for c in self.coords:
             c.printTree(indent + 1)
 

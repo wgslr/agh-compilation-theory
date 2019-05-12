@@ -6,6 +6,7 @@ from Exceptions import *
 from visit import *
 import sys
 import operator
+import copy
 
 binop_to_operator = {
     '+': operator.add,
@@ -74,7 +75,7 @@ class Interpreter(object):
         else:
             rhs = node.right.accept(self)
             op_fun = binop_to_operator[node.op[0]]
-            value = op_fun(var.accept(self), rhs) 
+            value = op_fun(node.left.accept(self), rhs) 
             self.memories.insert(var, value)
 
     @when(AST.Print)
@@ -89,14 +90,16 @@ class Interpreter(object):
 
     @when(AST.Reference)
     def visit(self, node):
+        node2 = copy.deepcopy(node)
         lvalue = self.lvalue
         self.lvalue = False
-        node.coords = [c.accept(self) for c in node.coords]
+        print("resolve {} in {}".format(node2.coords, node2))
+        node2.coords = [c.accept(self) for c in node2.coords]
 
         if lvalue:
-            return node
+            return node2
         else:
-            return self.memories.get(node)
+            return self.memories.get(node2)
 
     @when(AST.IntNum)
     def visit(self, node):

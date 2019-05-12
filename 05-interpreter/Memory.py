@@ -16,7 +16,7 @@ class Memory:
         if isinstance(node, AST.Variable):
             return self.variables.get(node.name)
         elif isinstance(node, AST.Reference):
-            return self.variables.get(node.name.name)
+            return self.variables.get(node.container.name)
         else:
             raise TypeError("{} is not a memory reference".format(node.__class__))
 
@@ -27,7 +27,7 @@ class Memory:
             return self.variables.get(node.name)
         elif isinstance(node, AST.Reference):
             print("getting reference")
-            value = self.get(node.name)
+            value = self.get(node.container)
             for coord in node.coords:
                 print("value = {}[{}]".format(value, coord))
                 value = value[coord]
@@ -43,7 +43,7 @@ class Memory:
             self.variables[node.name] = value
         elif isinstance(node, AST.Reference):
             print("setting reference")
-            container = self.variables[node.name.name]
+            container = self.variables[node.container.name]
             for coord in node.coords[:-1]:
                 container = container[coord]
             container[node.coords[-1]] = value

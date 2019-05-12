@@ -51,13 +51,14 @@ class Matrix(Vector):
 class Reference(Node):
     """A matrix cell reference"""
 
-    def __init__(self, lineno, name, coords):
+    def __init__(self, lineno, container, coords):
         self.lineno = lineno
-        self.name = name
+        self.container = container
+        self.name = container
         self.coords = coords
 
     # def __str__(self):
-    #     return self.name.name + "[" + ", ".join(str(x.value) for x in self.coords) + "]"
+    #     return self.container.name + "[" + ", ".join(str(x.value) for x in self.coords) + "]"
 
 
 class FunctionCall(Node):
