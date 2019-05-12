@@ -61,9 +61,6 @@ class Interpreter(object):
 
     @when(AST.Assignment)
     def visit(self, node):
-        print("intepret assignment: {} {} {}".format(
-            node.left, node.op, node.right))
-
         self.lvalue = True
         target_ref = node.left.accept(self)
         self.lvalue = False
@@ -89,7 +86,6 @@ class Interpreter(object):
     @when(AST.Variable)
     def visit(self, node):
         if self.lvalue:
-            print("return node since lvalue")
             return node
         return self.memories.get(node)
 

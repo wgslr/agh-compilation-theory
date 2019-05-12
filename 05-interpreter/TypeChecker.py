@@ -210,8 +210,6 @@ class TypeChecker(NodeVisitor):
         var2 = self.visit(node.right)
         if not var2:
             return None
-        print("node.left: {} var1: {}".format(node.left.name, var1))
-        # print(var1.type)
         if isinstance(node.left, AST.Variable):
             name = node.left.name
         else:

@@ -17,7 +17,6 @@ class Memory:
         if isinstance(node, AST.Variable):
             return self.variables.get(node.name)
         elif isinstance(node, Interpreter.ConcreteReference):
-            print(node.container)
             return self.variables.get(node.container.name)
         else:
             raise TypeError("{} is not a memory reference".format(node.__class__))
@@ -25,13 +24,10 @@ class Memory:
     def get(self, node):         # gets from memory current value of variable <name>
 
         if isinstance(node, AST.Variable):
-            print("getting variable")
             return self.variables.get(node.name)
         elif isinstance(node, Interpreter.ConcreteReference):
-            print("getting reference")
             value = self.get(node.container)
             for coord in node.coords:
-                print("value = {}[{}]".format(value, coord))
                 value = value[coord]
                 if value is None:
                     break
@@ -41,17 +37,14 @@ class Memory:
 
     def put(self, node, value):  # puts into memory current value of variable <name>
         if isinstance(node, AST.Variable):
-            print("setting variable")
             self.variables[node.name] = value
         elif isinstance(node, Interpreter.ConcreteReference):
-            print("setting reference")
             container = self.variables[node.container.name]
             for coord in node.coords[:-1]:
                 container = container[coord]
             container[node.coords[-1]] = value
         else:
             raise TypeError("{} is not a memory reference".format(node.__class__))
-        print("{} becomes {}".format(node.name, value))
 
 
 class MemoryStack:
