@@ -166,12 +166,13 @@ class Interpreter(object):
 
     @when(AST.For)
     def visit(self, node):
+        self.memories.push()
         self.lvalue = True
         iterator_ref = node.iterator.accept(self)
         self.lvalue = False
 
         start, end = node.range.accept(self)
-        self.memories.set(iterator_ref, start)
+        self.memories.insert(iterator_ref, start)
 
         while self.memories.get(iterator_ref) < end:
             try:
@@ -182,6 +183,7 @@ class Interpreter(object):
                 break
             iterator_val = self.memories.get(iterator_ref)
             self.memories.set(iterator_ref, iterator_val + 1)
+        self.memories.pop()
 
     @when(AST.Range)
     def visit(self, node):
