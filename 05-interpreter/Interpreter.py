@@ -8,6 +8,40 @@ import sys
 import operator
 import copy
 
+
+def transpose(matrix):
+    dim1 = len(matrix[0])
+    dim2 = len(matrix)
+    new_matrix = [[0] * dim2 for _ in range(dim1)]
+
+    for i in range(dim1):
+        for j in range(dim2):
+            new_matrix[i][j] = matrix[j][i]
+
+    return new_matrix
+
+
+def ones(dim1, dim2=None):
+    if dim2 is None:
+        dim2 = dim1
+    return [[1] * dim2 for _ in range(dim1)]
+
+
+def zeros(dim1, dim2=None):
+    if dim2 is None:
+        dim2 = dim1
+    return [[0] * dim2 for _ in range(dim1)]
+
+
+def eye(dim1, dim2=None):
+    if dim2 is None:
+        dim2 = dim1
+    arr = [[0] * dim2 for _ in range(dim1)]
+    for i in range(min(dim1, dim2)):
+        arr[i][i] = 1
+    return arr
+
+
 binop_to_operator = {
     '+': operator.add,
     '-': operator.sub,
@@ -21,13 +55,27 @@ binop_to_operator = {
     '==': operator.eq,
 }
 
-sys.setrecursionlimit(10000)
+unop_to_operator = {
+    'NEGATE': operator.neg,
+    'TRANSPOSE': transpose
+}
 
+builtin = {
+    'ones': ones,
+    'zeros': zeros,
+    'eye': eye
+}
+
+
+sys.setrecursionlimit(10000)
 
 # TODO make TypeChecker throw error when using undefined variable
 # in rhs context
 
 # TODO ensure all AST classes are covered
+
+# TODO implement matrix mul
+
 
 class Interpreter(object):
     memories = MemoryStack()
@@ -39,6 +87,11 @@ class Interpreter(object):
     @on('node')
     def visit(self, node):
         pass
+
+    @when(AST.Instructions)
+    def visit(self, node):
+        for n in node.nodes:
+            n.accept(self)
 
     @when(AST.Block)
     def visit(self, node):
@@ -53,58 +106,22 @@ class Interpreter(object):
         elif node.keyword == "CONTINUE":
             raise ContinueException()
 
-    @when(AST.Return)
-    def visit(self, node):
-        raise ReturnValueException(node.value)
-
-    @when(AST.Instructions)
-    def visit(self, node):
-        for n in node.nodes:
-            n.accept(self)
-
-    @when(AST.ArithmeticOperation)
-    def visit(self, node):
-        r1 = node.left.accept(self)
-        r2 = node.right.accept(self)
-        op_fun = binop_to_operator[node.op]
-        return op_fun(r1, r2)
-
-    @when(AST.Comparison)
-    def visit(self, node):
-        r1 = node.left.accept(self)
-        r2 = node.right.accept(self)
-        op_fun = binop_to_operator[node.op]
-        return op_fun(r1, r2)
-
-    @when(AST.Assignment)
-    def visit(self, node):
-        self.lvalue = True
-        target_ref = node.left.accept(self)
-        self.lvalue = False
-
-        if node.op == "=":
-            value = node.right.accept(self)
-            self.memories.set(target_ref, value)
-        else:
-            # TODO ensure it works for dot-operations
-            op_fun = binop_to_operator[node.op[0]]
-
-            rhs = node.right.accept(self)
-            lhs_value = node.left.accept(self)
-            value = op_fun(lhs_value, rhs)
-
-            self.memories.set(target_ref, value)
-
     @when(AST.Print)
     def visit(self, node):
         print "PRINT: " + ", ".join((str(arg.accept(self))
                                      for arg in node.arguments))
 
-    @when(AST.Variable)
+    @when(AST.Return)
     def visit(self, node):
-        if self.lvalue:
-            return node
-        return self.memories.get(node)
+        raise ReturnValueException(node.value)
+
+    @when(AST.Vector)
+    def visit(self, node):
+        return [e.accept(self) for e in node.elements]
+
+    @when(AST.Matrix)
+    def visit(self, node):
+        return [e.accept(self) for e in node.elements]
 
     @when(AST.Reference)
     def visit(self, node):
@@ -124,46 +141,9 @@ class Interpreter(object):
 
     @when(AST.FunctionCall)
     def visit(self, node):
-        [dim1, dim2] = node.arguments if len(node.arguments) == 2 \
-            else [node.arguments[0], node.arguments[0]]
-        dim1, dim2 = dim1.accept(self), dim2.accept(self)
-
-        if node.name == "ones":
-            return [[1] * dim2 for _ in range(dim1)]
-        elif node.name == "zeros":
-            return [[0] * dim2 for _ in range(dim1)]
-        elif node.name == "eye":
-            arr = [[0] * dim2 for _ in range(dim1)]
-            for i in range(min(dim1 ,dim2)):
-                arr[i][i] = 1
-            return arr
-
-    @when(AST.IntNum)
-    def visit(self, node):
-        return node.value
-
-    @when(AST.Vector)
-    def visit(self, node):
-        return [e.accept(self) for e in node.elements]
-
-    @when(AST.Matrix)
-    def visit(self, node):
-        return [e.accept(self) for e in node.elements]
-
-    @when(AST.FloatNum)
-    def visit(self, node):
-        return node.value
-
-    @when(AST.String)
-    def visit(self, node):
-        return node.value
-
-    @when(AST.If)
-    def visit(self, node):
-        if node.condition.accept(self):
-            node.body.accept(self)
-        elif node.else_body is not None:
-            node.else_body.accept(self)
+        arguments = [arg.accept(self) for arg in node.arguments]
+        func = builtin[node.name]
+        return func(*arguments)
 
     @when(AST.While)
     def visit(self, node):
@@ -199,6 +179,74 @@ class Interpreter(object):
         start = node.start.accept(self)
         end = node.end.accept(self)
         return start, end
+
+    @when(AST.Variable)
+    def visit(self, node):
+        if self.lvalue:
+            return node
+        return self.memories.get(node)
+
+    @when(AST.If)
+    def visit(self, node):
+        if node.condition.accept(self):
+            node.body.accept(self)
+        elif node.else_body is not None:
+            node.else_body.accept(self)
+
+    @when(AST.ArithmeticOperation)
+    def visit(self, node):
+        r1 = node.left.accept(self)
+        r2 = node.right.accept(self)
+        op_fun = binop_to_operator[node.op]
+        return op_fun(r1, r2)
+
+    @when(AST.Assignment)
+    def visit(self, node):
+        self.lvalue = True
+        target_ref = node.left.accept(self)
+        self.lvalue = False
+
+        if node.op == "=":
+            value = node.right.accept(self)
+            self.memories.set(target_ref, value)
+        else:
+            # TODO ensure it works for dot-operations
+            op_fun = binop_to_operator[node.op[0]]
+
+            rhs = node.right.accept(self)
+            lhs_value = node.left.accept(self)
+            value = op_fun(lhs_value, rhs)
+
+            self.memories.set(target_ref, value)
+
+    @when(AST.String)
+    def visit(self, node):
+        return node.value
+
+    @when(AST.IntNum)
+    def visit(self, node):
+        return node.value
+
+    @when(AST.FloatNum)
+    def visit(self, node):
+        return node.value
+
+    @when(AST.FloatNum)
+    def visit(self, node):
+        return node.value
+
+    @when(AST.Comparison)
+    def visit(self, node):
+        r1 = node.left.accept(self)
+        r2 = node.right.accept(self)
+        op_fun = binop_to_operator[node.op]
+        return op_fun(r1, r2)
+
+    @when(AST.UnaryExpr)
+    def visit(self, node):
+        op_fun = unop_to_operator[node.operation]
+        operand = node.operand.accept(self)
+        return op_fun(operand)
 
 
 class ConcreteReference(AST.Reference):
