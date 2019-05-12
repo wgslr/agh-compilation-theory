@@ -61,25 +61,25 @@ class Interpreter(object):
 
     @when(AST.Assignment)
     def visit(self, node):
-        print("inteprete assignemnt: {} {} {}".format(
+        print("intepret assignment: {} {} {}".format(
             node.left, node.op, node.right))
-        # TODO make it work for matrices on lhs
 
         self.lvalue = True
-        var = node.left.accept(self)
-        print("var: {}".format(var))
+        target_ref = node.left.accept(self)
         self.lvalue = False
 
         if node.op == "=":
             value = node.right.accept(self)
-            # TODO danger - 'name' can be Reference.name
-            self.memories.insert(var, value)
+            self.memories.insert(target_ref, value)
         else:
-            rhs = node.right.accept(self)
+            # TODO ensure it works for dot-operations 
             op_fun = binop_to_operator[node.op[0]]
-            print("node.left.accept")
-            value = op_fun(node.left.accept(self), rhs)
-            self.memories.insert(var, value)
+
+            rhs = node.right.accept(self)
+            lhs_value = node.left.accept(self)
+            value = op_fun(lhs_value, rhs)
+
+            self.memories.insert(target_ref, value)
 
     @when(AST.Print)
     def visit(self, node):
