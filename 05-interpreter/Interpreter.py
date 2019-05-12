@@ -84,8 +84,6 @@ sys.setrecursionlimit(10000)
 
 # TODO implement matrix mul
 
-# TODO handle return
-
 class Interpreter(object):
     memories = MemoryStack()
 
@@ -122,7 +120,7 @@ class Interpreter(object):
 
     @when(AST.Return)
     def visit(self, node):
-        raise ReturnValueException(node.value)
+        raise ReturnValueException(node.value.accept(self))
 
     @when(AST.Vector)
     def visit(self, node):

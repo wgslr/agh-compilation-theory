@@ -6,7 +6,7 @@ import Mparser
 from TreePrinter import TreePrinter
 from TypeChecker import TypeChecker
 from Interpreter import Interpreter
-
+from Exceptions import ReturnValueException
 
 if __name__ == '__main__':
 
@@ -28,7 +28,10 @@ if __name__ == '__main__':
         typeChecker.visit(ast)
 
         if not typeChecker.encountered_error:
-            ast.accept(Interpreter())
+            try:
+                ast.accept(Interpreter())
+            except ReturnValueException as e:
+                print("RETURN: {}".format(e.value))
 
     # in future
     # ast.accept(OptimizationPass1())

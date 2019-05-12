@@ -242,21 +242,17 @@ class TypeChecker(NodeVisitor):
         return result
 
     def visit_If(self, node):
-        # print("visit_if")
-        pass
+        self.visit(node.condition)
+        self.visit(node.body)
+        if node.else_body:
+            self.visit(node.else_body)
 
     def visit_BinExpr(self, node):
         # print("visit_BinExpr")
 
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
-        if not var1:
-            self.print_error(
-                node, "undefined variable {}".format(node.left.name))
-            return None
-        if not var2:
-            # self.print_error(node, "undefined variable {}".format(node.right.name))
-            return None
+
         op = node.op
         newtype = allowed_operations[op][var1.type][var2.type]
         if newtype:
@@ -266,7 +262,7 @@ class TypeChecker(NodeVisitor):
         else:
             self.print_error(node, "cannot {} {} and {}".format(
                 op_to_string[op], var1.type, var2.type))
-            return None
+            return Undefined()
 
     def visit_ArithmeticOperation(self, node):
         # print("visit_ArithmeticOperation")
@@ -286,9 +282,8 @@ class TypeChecker(NodeVisitor):
         if not overwrite and var1.isUndefined():
             return None
 
-        if var2.type == "undefined":
-            self.print_error(
-                node, "undefined variable {}".format(node.right.name))
+        if var2.isUndefined():
+            return None
 
         if is_slice:
             if var1.type == 'vector' and var2.type != 'vector':
@@ -341,7 +336,7 @@ class TypeChecker(NodeVisitor):
     def visit_UnaryExpr(self, node):
         # print("visit_UnaryExpr")
         operand=self.visit(node.operand)
-        if operand.type == "undefined":
+        if operand.isUndefined():
             self.print_error(
                 node, "undefined variable {}".format(operand.name))
         newtype=allowed_operations[node.operation][operand.type][operand.type]
@@ -350,13 +345,13 @@ class TypeChecker(NodeVisitor):
         else:
             self.print_error(node, "cannot perform {} on {}".format(
                 node.operation, operand.type))
+            return Undefined()
 
     def visit_Comparison(self, node):
-        # print("visit_Comparison")
-        pass
+        self.visit(node.left)
+        self.visit(node.right)
 
     def visit_Error(self, node):
-        # print("visit_Error")
         pass
 
     def print_error(self, node, error):
