@@ -15,14 +15,13 @@ class Memory:
 
     def has_key(self, node):  # variable name
         if isinstance(node, AST.Variable):
-            return self.variables.get(node.name)
+            return self.variables.get(node.name) is not None
         elif isinstance(node, Interpreter.ConcreteReference):
-            return self.variables.get(node.container.name)
+            return self.variables.get(node.container.name) is not None
         else:
             raise TypeError("{} is not a memory reference".format(node.__class__))
 
     def get(self, node):         # gets from memory current value of variable <name>
-
         if isinstance(node, AST.Variable):
             return self.variables.get(node.name)
         elif isinstance(node, Interpreter.ConcreteReference):

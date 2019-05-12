@@ -287,7 +287,7 @@ class TypeChecker(NodeVisitor):
             else:
                 new_type  = allowed_operations[op[0]][var1.type][var2.type]
                 if new_type != "":
-                    new_var = Variable(new_type, var2.size, name)
+                    new_var = Variable(new_type, var2.size, var1.name)
                     self.symbols.put(var1.name, new_var)
                 else:
                     op_str=op_to_string[op]
