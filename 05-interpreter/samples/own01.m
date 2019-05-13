@@ -12,9 +12,10 @@ for N = 1 : N / 2 {
 
 
 x = "a string";
+print "outer scope:", x;
 {
     x = 100;
-    print x;
+    print "inner scope:", x;
 }
 
-print x;
+print "outer scope again:", x;

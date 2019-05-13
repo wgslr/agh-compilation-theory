@@ -124,7 +124,7 @@ class Interpreter(object):
 
     @when(AST.Print)
     def visit(self, node):
-        print "PRINT: " + ", ".join(str(arg.accept(self))
+        print " ".join(str(arg.accept(self))
                                     for arg in node.arguments)
 
     @when(AST.Return)

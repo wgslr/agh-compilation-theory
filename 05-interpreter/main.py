@@ -28,7 +28,8 @@ if __name__ == '__main__':
         typeChecker.visit(ast)
 
         if not typeChecker.encountered_error:
+            print
             try:
                 ast.accept(Interpreter())
             except ReturnValueException as e:
-                print("RETURN: {}".format(e.value))
+                print("RETURNED {}".format(e.value))
