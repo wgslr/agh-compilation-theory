@@ -124,8 +124,15 @@ class Interpreter(object):
 
     @when(AST.Print)
     def visit(self, node):
-        print " ".join(str(arg.accept(self))
-                                    for arg in node.arguments)
+        args = []
+        for arg in node.arguments:
+            arg = arg.accept(self)
+            if isinstance(arg, list):
+                args += ["[" + "\n ".join(str(a) for a in arg) + "]"]
+            else:
+                args += [str(arg)]
+
+        print " ".join(args)
 
     @when(AST.Return)
     def visit(self, node):
