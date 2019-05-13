@@ -260,16 +260,12 @@ class TypeChecker(NodeVisitor):
             if var1.type == 'vector' and var2.type != 'vector':
                 self.print_error(
                     node, "cannot assing {} to a matrix slice, expected vector".format(var2.type))
-                return None
-            if var1.type == 'vector' and var2.size != var1.size[1]:
+            elif var1.type == 'vector' and var2.size != var1.size[1]:
                 self.print_error(node, "vector sized {} does not match matrix dimensions".format(var2.size))
-                return None
             # visiting reference always returns float when all dimensions are unpacked
-            if var1.type == 'float':
+            elif var1.type == 'float':
                 if var2.type not in ('int', 'float'):
                     self.print_error(node, 'Matrix element must be INT or FLOAT')
-                    return None
-                
         else:
             if overwrite:
                 new_var = Variable(var2.type, var2.size, var1.name)
