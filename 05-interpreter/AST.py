@@ -2,7 +2,6 @@
 
 class Node(object):
     def accept(self, visitor):
-        # print("{} accepts {}".format(self.__class__, visitor.__class__))
         return visitor.visit(self)
 
 
@@ -56,9 +55,6 @@ class Reference(Node):
         self.container = container
         self.name = container
         self.coords = coords
-
-    # def __str__(self):
-    #     return self.container.name + "[" + ", ".join(str(x.value) for x in self.coords) + "]"
 
 
 class FunctionCall(Node):

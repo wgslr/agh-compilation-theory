@@ -91,27 +91,22 @@ class TypeChecker(NodeVisitor):
         return True
 
     def visit_Block(self, node):
-        # print("visit_Instructions")
         self.symbols = self.symbols.createChild()
         self.visit(node.content)
         self.symbols = self.symbols.getParentScope()
 
     def visit_Instructions(self, node):
-        # print("visit_Instructions")
         map(self.visit, node.nodes)
 
     def visit_FlowKeyword(self, node):
-        # print("visit_Flowkeyword")
         if self.loop == 0:
             self.print_error(
                 node, "flow keyword {} must be used inside a loop".format(node.keyword))
 
     def visit_Print(self, node):
-        # print("visit_Print")
         map(self.visit, node.arguments)
 
     def visit_Return(self, node):
-        # print("visit_Return")
         if node.value is not None:
             self.visit(node.value)
 
@@ -135,7 +130,6 @@ class TypeChecker(NodeVisitor):
         return Variable("vector", [len(node.elements)])
 
     def visit_Reference(self, node, *args, **kwargs):
-        # print("visit_Reference")
 
         container = self.visit(node.container)
         if container.isUndefined():
@@ -170,7 +164,6 @@ class TypeChecker(NodeVisitor):
             return Variable("vector", [container.size[-1]])
 
     def visit_FunctionCall(self, node):
-        # print("visit_FunctionCall")
         arguments = node.arguments
 
         for arg in arguments:
@@ -192,13 +185,11 @@ class TypeChecker(NodeVisitor):
         return Variable("matrix", bounds)
 
     def visit_While(self, node):
-        # print("visit_While")
         self.loop += 1
         self.visit(node.body)
         self.loop -= 1
 
     def visit_For(self, node):
-        # print("visit_For")
         self.visit(node.range)
 
         self.loop += 1
@@ -212,12 +203,10 @@ class TypeChecker(NodeVisitor):
         self.loop -= 1
 
     def visit_Range(self, node):
-        # print("visit_Range")
         self.visit(node.start)
         self.visit(node.end)
 
     def visit_Variable(self, node, allow_undefined=False):
-        # print("visit_Variable")
         result = self.symbols.get(node.name)
         if result is None:
             if not allow_undefined:
@@ -233,7 +222,6 @@ class TypeChecker(NodeVisitor):
             self.visit(node.else_body)
 
     def visit_BinExpr(self, node):
-        # print("visit_BinExpr")
 
         var1 = self.visit(node.left)
         var2 = self.visit(node.right)
@@ -250,11 +238,9 @@ class TypeChecker(NodeVisitor):
             return Undefined()
 
     def visit_ArithmeticOperation(self, node):
-        # print("visit_ArithmeticOperation")
         return self.visit_BinExpr(node)
 
     def visit_Assignment(self, node):
-        # print("visit_Assignment")
 
         op = node.op
         overwrite = op == "="
@@ -311,15 +297,12 @@ class TypeChecker(NodeVisitor):
             return var1.size
 
     def visit_IntNum(self, node):
-        # print("visit_IntNum")
         return Variable("int")
 
     def visit_FloatNum(self, node):
-        # print("visit_FloatNum")
         return Variable("float")
 
     def visit_UnaryExpr(self, node):
-        # print("visit_UnaryExpr")
         operand=self.visit(node.operand)
         if operand.isUndefined():
             self.print_error(
