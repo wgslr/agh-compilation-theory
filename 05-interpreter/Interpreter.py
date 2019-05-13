@@ -8,6 +8,8 @@ import sys
 import operator
 import copy
 
+sys.setrecursionlimit(10000)
+
 
 def transpose(matrix):
     dim1 = len(matrix[0])
@@ -55,7 +57,7 @@ def mul(var1, var2):
     return result
 
 
-binop_to_operator = {
+binop_to_fun = {
     '+': operator.add,
     '-': operator.sub,
     '*': mul,
@@ -68,12 +70,12 @@ binop_to_operator = {
     '==': operator.eq,
 }
 
-unop_to_operator = {
+unop_to_fun = {
     'NEGATE': operator.neg,
     'TRANSPOSE': transpose
 }
 
-builtin = {
+builtin_to_fun = {
     'ones': ones,
     'zeros': zeros,
     'eye': eye
@@ -85,14 +87,8 @@ def elementwise(op):
         if isinstance(left, list):
             return [fun(l, r) for l, r in zip(left, right)]
         else:
-            return binop_to_operator[op[1]](left, right)
+            return binop_to_fun[op[1]](left, right)
     return fun
-
-
-sys.setrecursionlimit(10000)
-
-
-# TODO ensure all AST classes are covered
 
 
 class Interpreter(object):
@@ -162,7 +158,7 @@ class Interpreter(object):
     @when(AST.FunctionCall)
     def visit(self, node):
         arguments = [arg.accept(self) for arg in node.arguments]
-        func = builtin[node.name]
+        func = builtin_to_fun[node.name]
         return func(*arguments)
 
     @when(AST.While)
@@ -224,7 +220,7 @@ class Interpreter(object):
         if node.op[0] == '.':
             op_fun = elementwise(node.op)
         else:
-            op_fun = binop_to_operator[node.op]
+            op_fun = binop_to_fun[node.op]
         return op_fun(r1, r2)
 
     @when(AST.Assignment)
@@ -237,7 +233,7 @@ class Interpreter(object):
             value = node.right.accept(self)
             self.memories.insert(target_ref, value)
         else:
-            op_fun = binop_to_operator[node.op[0]]
+            op_fun = binop_to_fun[node.op[0]]
 
             rhs = node.right.accept(self)
             lhs_value = node.left.accept(self)
@@ -263,7 +259,7 @@ class Interpreter(object):
 
     @when(AST.UnaryExpr)
     def visit(self, node):
-        op_fun = unop_to_operator[node.operation]
+        op_fun = unop_to_fun[node.operation]
         operand = node.operand.accept(self)
         return op_fun(operand)
 
@@ -271,7 +267,7 @@ class Interpreter(object):
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
-        op_fun = binop_to_operator[node.op]
+        op_fun = binop_to_fun[node.op]
         return op_fun(r1, r2)
 
 
