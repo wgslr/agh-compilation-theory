@@ -91,12 +91,8 @@ def elementwise(op):
 
 sys.setrecursionlimit(10000)
 
-# TODO make TypeChecker throw error when using undefined variable
-# in rhs context
 
 # TODO ensure all AST classes are covered
-
-# TODO implement matrix mul
 
 
 class Interpreter(object):
@@ -118,8 +114,10 @@ class Interpreter(object):
     @when(AST.Block)
     def visit(self, node):
         self.memories.push()
-        node.content.accept(self)
-        self.memories.pop()
+        try:
+            node.content.accept(self)
+        finally:
+            self.memories.pop()
 
     @when(AST.FlowKeyword)
     def visit(self, node):
@@ -130,8 +128,8 @@ class Interpreter(object):
 
     @when(AST.Print)
     def visit(self, node):
-        print "PRINT: " + ", ".join((str(arg.accept(self))
-                                     for arg in node.arguments))
+        print "PRINT: " + ", ".join(str(arg.accept(self))
+                                     for arg in node.arguments)
 
     @when(AST.Return)
     def visit(self, node):
@@ -180,23 +178,25 @@ class Interpreter(object):
     @when(AST.For)
     def visit(self, node):
         self.memories.push()
-        self.lvalue = True
-        iterator_ref = node.iterator.accept(self)
-        self.lvalue = False
+        try:
+            self.lvalue = True
+            iterator_ref = node.iterator.accept(self)
+            self.lvalue = False
 
-        start, end = node.range.accept(self)
-        self.memories.insert(iterator_ref, start)
+            start, end = node.range.accept(self)
+            self.memories.insert(iterator_ref, start)
 
-        while self.memories.get(iterator_ref) < end:
-            try:
-                node.body.accept(self)
-            except ContinueException:
-                pass
-            except BreakException:
-                break
-            iterator_val = self.memories.get(iterator_ref)
-            self.memories.set(iterator_ref, iterator_val + 1)
-        self.memories.pop()
+            while self.memories.get(iterator_ref) < end:
+                try:
+                    node.body.accept(self)
+                except ContinueException:
+                    pass
+                except BreakException:
+                    break
+                iterator_val = self.memories.get(iterator_ref)
+                self.memories.set(iterator_ref, iterator_val + 1)
+        finally:
+            self.memories.pop()
 
     @when(AST.Range)
     def visit(self, node):
@@ -237,7 +237,6 @@ class Interpreter(object):
             value = node.right.accept(self)
             self.memories.insert(target_ref, value)
         else:
-            # TODO ensure it works for dot-operations
             op_fun = binop_to_operator[node.op[0]]
 
             rhs = node.right.accept(self)
