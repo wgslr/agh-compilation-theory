@@ -5,7 +5,7 @@ y = 4;
     y = "abc";
     a = "55";
     z = y + a;
-    print z;
+    print "string concatenation: " + z;
 }
 z = x + y;
 print z;
