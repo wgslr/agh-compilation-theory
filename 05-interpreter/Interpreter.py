@@ -129,7 +129,7 @@ class Interpreter(object):
     @when(AST.Print)
     def visit(self, node):
         print "PRINT: " + ", ".join(str(arg.accept(self))
-                                     for arg in node.arguments)
+                                    for arg in node.arguments)
 
     @when(AST.Return)
     def visit(self, node):
@@ -261,18 +261,18 @@ class Interpreter(object):
     def visit(self, node):
         return node.value
 
+    @when(AST.UnaryExpr)
+    def visit(self, node):
+        op_fun = unop_to_operator[node.operation]
+        operand = node.operand.accept(self)
+        return op_fun(operand)
+
     @when(AST.Comparison)
     def visit(self, node):
         r1 = node.left.accept(self)
         r2 = node.right.accept(self)
         op_fun = binop_to_operator[node.op]
         return op_fun(r1, r2)
-
-    @when(AST.UnaryExpr)
-    def visit(self, node):
-        op_fun = unop_to_operator[node.operation]
-        operand = node.operand.accept(self)
-        return op_fun(operand)
 
 
 class ConcreteReference(AST.Reference):
